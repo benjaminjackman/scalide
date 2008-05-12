@@ -2,6 +2,9 @@ package org.scalide
 
 class Scalide(private val args : Array[String]) {
   import scala.actors.Actor._
+  import scala.tools.nsc.{Interpreter, Settings}
+  
+  val interp = new Interpreter(new Settings(Console.println))
   
   val p = actor {
     import ScalideGUIMessages._

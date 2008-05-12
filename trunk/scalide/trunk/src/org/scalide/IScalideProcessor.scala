@@ -2,6 +2,7 @@ package org.scalide
 
 
 sealed abstract class ScalideGUIMessage
+
 object ScalideGUIMessages {
   case class NewFile extends ScalideGUIMessage
   case class OpenFile extends ScalideGUIMessage
