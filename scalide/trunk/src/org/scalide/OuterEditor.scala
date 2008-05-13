@@ -3,6 +3,7 @@ package org.scalide
 import javax.swing._
 import org.scalide.utils.BetterSwing._
 import java.awt.{Color, Dimension, Font}
+import java.awt.event.{KeyListener, KeyEvent}
 import scala.actors._
 import Actor._
 import ScalideInterpreterMessages._
@@ -11,6 +12,7 @@ import java.io.{StringReader}
 class OuterEditor(listener : Actor) extends JTextPane {
   
   var editors = List[InnerEditor](mkInnerEditor(false))
+  var focused :Option[InnerEditor] = Some(editors.first)
   
   swingLater {
     println("Making Panel " + Thread.currentThread)
@@ -18,6 +20,17 @@ class OuterEditor(listener : Actor) extends JTextPane {
     setForeground(Color.BLUE)
     setBackground(Color.GRAY.brighter.brighter)
     setFont(new Font("Consolas", 0,12))
+    addKeyListener(new KeyListener {
+      def keyTyped(e : KeyEvent) {
+        e.consume
+      }
+      def keyPressed(e : KeyEvent) {
+        e.consume
+      }
+      def keyReleased(e : KeyEvent) {
+        e.consume
+      }
+    })
     refresh
   }
   
@@ -30,9 +43,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   }
   
   def start {
-    swingLater {
-      editors(0).grabFocus
-    }
+    refresh
   }
   
   def refresh {
@@ -52,6 +63,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
         insertComponent(label)
         insertComponent(ed)
         getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
+      }
+      //Focus on the active editor
+      focused match {
+      case Some(x) => x.grabFocus
+      case None =>
       }
     }
   }
@@ -89,7 +105,8 @@ class OuterEditor(listener : Actor) extends JTextPane {
           }
         }
         if (!insertedIt) {
-          editors = editors:::mkNew::Nil
+          editors = editors:::mkNew::mkInnerEditor(false)::Nil
+          focused = Some(editors.last)
         }
         println("Editors " + editors.size)
         refresh
