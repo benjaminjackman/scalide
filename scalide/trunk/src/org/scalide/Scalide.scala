@@ -1,29 +1,41 @@
 package org.scalide
 
 class Scalide(private val args : Array[String]) {
-  import scala.actors.Actor._
-  import scala.tools.nsc.{Interpreter, Settings}
+  import scala.actors.Actor
+  import Actor._
+  import processors.ScalaProcessor
   
-  val interp = new Interpreter(new Settings(Console.println))
+  val interp = new ScalaProcessor(p)
+  val frame = new ScalideFrame(p)
   
-  val p = actor {
+  val p : Actor = actor {
     import ScalideGUIMessages._
+    import ScalideInterpreterMessages._
       loop {
         receive {
-        case msg : ScalideGUIMessage => msg match {
-        case NewFile() => println(msg)
-        case OpenFile() => println(msg)
-        case SaveFile() => println(msg)
-        case RestartInterpreter() => println(msg)
-        case ProcessCommand(cmd) => println(cmd)    
-        }	
-        case msg => println("Unhandled Message" + msg)
+        case msg : ScalideGUIMessage => 
+          msg match {
+          case NewFile() => 
+            println(msg)
+          case OpenFile() => 
+            println(msg)
+          case SaveFile() => 
+            println(msg)
+          case RestartInterpreter() => 
+            interp.restart()
+          case cmd : GUICommand => 
+            interp.process(cmd)
+          }
+        case msg : ScalideInterpreterMessage => 
+          msg match {
+          case res : InterpResult =>
+            frame.process(res)
+          }
+        case msg => println("Unhandled Message " + msg)
         }
       }
   }
   
-  p.start
   
-  val frame = new ScalideFrame(p)
   
 }
