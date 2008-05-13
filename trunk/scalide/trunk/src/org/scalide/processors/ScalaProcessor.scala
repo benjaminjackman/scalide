@@ -16,13 +16,13 @@ class ScalaProcessor(private val p : Actor) {
    * appropriate actor
    */
   private def handleError (res : String) {
-    println("Err: " + res)
+    println("Err: [" + res + "]")
     commandProc ! ResultText(res)
   }
   
   private def handleResult (res : String) {
-    println("Res: " + res)
-    commandProc ! ResultText(res)    
+    println("Res: [" + res.trim + "]")
+    commandProc ! ResultText(res.trim)    
   }
   
   private def mkPipe = {
