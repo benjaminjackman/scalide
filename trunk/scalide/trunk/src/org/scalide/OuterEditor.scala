@@ -7,9 +7,9 @@ import scala.actors._
 import Actor._
 import ScalideInterpreterMessages._
 
-class ScalidePanel(listener : Actor) extends JTextPane {
+class OuterEditor(listener : Actor) extends JTextPane {
   
-  
+  val innerEditor = new InnerEditor(listener)
   
   swingLater {
     println("Making Panel " + Thread.currentThread)
@@ -17,26 +17,28 @@ class ScalidePanel(listener : Actor) extends JTextPane {
     setForeground(Color.BLUE)
     setBackground(Color.GRAY.brighter.brighter)
     setFont(new Font("Consolas", 0,12))
-
-    val innerEditor = new JTextPane
-    innerEditor.setFont(new Font("Consolas", 0, 12))
-    innerEditor.setBorder(BorderFactory.createMatteBorder(0,1,1,2,Color.BLUE))
+    
     
     setCaretPosition(getDocument.getLength)
     insertComponent(innerEditor)
-
-    
-    innerEditor.grabFocus
   }
-  
-  
   
   def process(res : InterpResult) {
     proc ! res
   }
   
+  def start {
+    innerEditor.grabFocus
+  }
+  
   val proc : Actor = actor {
-    
+    loop {
+      receive {
+      case res : InterpResult =>
+               
+      
+      }
+    }
   }
 }
 

@@ -11,7 +11,7 @@ import ScalideInterpreterMessages._
 class ScalideFrame(private val p : Actor) extends JFrame {
   import BetterSwing._
   
-  val panel = new ScalidePanel(p)
+  val editor = new OuterEditor(p)
   
   private[scalide] val proc = actor {
     
@@ -27,7 +27,7 @@ class ScalideFrame(private val p : Actor) extends JFrame {
           }
         )
       case res : InterpResult =>
-        panel process res
+        editor process res
       }
     }
   }
@@ -62,13 +62,13 @@ class ScalideFrame(private val p : Actor) extends JFrame {
     setJMenuBar(mkMenuBar)
     setTitle("Scalide")
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    setContentPane(new JScrollPane(panel))
+    setContentPane(new JScrollPane(editor))
     pack
     setVisible(true)
     //Have to set size after making the frame visible
-    setSize(new Dimension(500, 700))    
+    setSize(new Dimension(500, 700))
+    editor.start
   }
-  
   
   private case class GUITask(fn : () => Unit)
   
