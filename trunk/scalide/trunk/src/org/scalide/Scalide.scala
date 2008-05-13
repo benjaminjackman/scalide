@@ -5,9 +5,6 @@ class Scalide(private val args : Array[String]) {
   import Actor._
   import processors.ScalaProcessor
   
-  val interp = new ScalaProcessor(p)
-  val frame = new ScalideFrame(p)
-  
   val p : Actor = actor {
     import ScalideGUIMessages._
     import ScalideInterpreterMessages._
@@ -35,6 +32,9 @@ class Scalide(private val args : Array[String]) {
         }
       }
   }
+  
+  val interp = new ScalaProcessor(p)
+  val frame = new ScalideFrame(p)
   
   
   

@@ -6,10 +6,11 @@ import java.awt.{Color, Dimension, Font}
 import scala.actors._
 import Actor._
 import ScalideInterpreterMessages._
+import java.io.{StringReader}
 
 class OuterEditor(listener : Actor) extends JTextPane {
   
-  val innerEditor = new InnerEditor(listener)
+  var editors = List[InnerEditor](mkInnerEditor(false))
   
   swingLater {
     println("Making Panel " + Thread.currentThread)
@@ -17,10 +18,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
     setForeground(Color.BLUE)
     setBackground(Color.GRAY.brighter.brighter)
     setFont(new Font("Consolas", 0,12))
-    
-    
-    setCaretPosition(getDocument.getLength)
-    insertComponent(innerEditor)
+    refresh
+  }
+  
+  def mkInnerEditor(isOut : Boolean) = {
+    new InnerEditor(listener, isOut)
   }
   
   def process(res : InterpResult) {
@@ -28,15 +30,69 @@ class OuterEditor(listener : Actor) extends JTextPane {
   }
   
   def start {
-    innerEditor.grabFocus
+    swingLater {
+      editors(0).grabFocus
+    }
+  }
+  
+  def refresh {
+    swingLater {
+      //Make a safe copy of the editors val 
+      //so that it does not change midway through
+      //Not sure if i have to do this, i don't
+      //understand generators well enough yet
+      val editors = this.editors
+      //Clear the component
+      this.setText("")
+      setCaretPosition(getDocument.getLength)
+      for (ed <- editors) {
+        val label = new JLabel(if (ed.isOut) "out " else "in ")
+        label.setForeground(Color.BLUE)
+        label.setFont(new Font("Consolas", 0, 10))
+        insertComponent(label)
+        insertComponent(ed)
+        getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
+      }
+    }
   }
   
   val proc : Actor = actor {
     loop {
       receive {
       case res : InterpResult =>
-               
-      
+        var foundIt = false;
+        var insertedIt = false;
+        def mkNew = {
+          val newEd = mkInnerEditor(true)
+          newEd.setText(res.text)
+          newEd
+        }
+        editors = editors.flatMap{ ed =>
+          if (insertedIt) {
+            ed::Nil
+          } else if (foundIt) {
+            insertedIt = true
+            if (ed.isOut) {
+              println("Inserting result to out editor")
+              ed.setText(res.text)
+              ed::Nil
+            } else {
+              println("Making new editor")
+              mkNew::ed::Nil
+            }
+          } else {
+            println("Found Editor")
+            if (ed == res.cmd.editor) {
+              foundIt = true
+              }
+            ed::Nil
+          }
+        }
+        if (!insertedIt) {
+          editors = editors:::mkNew::Nil
+        }
+        println("Editors " + editors.size)
+        refresh
       }
     }
   }

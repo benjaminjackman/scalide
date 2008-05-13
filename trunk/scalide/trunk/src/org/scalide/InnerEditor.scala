@@ -7,7 +7,7 @@ import java.awt.{Color, Dimension, Font, Event}
 import java.awt.event.{KeyEvent, ActionEvent}
 import scala.actors._
 
-class InnerEditor(listener : Actor) extends JTextPane {
+class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTextPane {
   swingLater {
     
     //Binds all the actions that we want
@@ -31,16 +31,15 @@ class InnerEditor(listener : Actor) extends JTextPane {
       import Event._;
       
       //Bind the execute command
-//      bindAction(VK_ENTER, SHIFT_MASK) {
-      bindAction(VK_B, CTRL_MASK) {
+      bindAction(VK_ENTER, SHIFT_MASK) {
         import org.scalide.ScalideGUIMessages._
         
-        val text = "5+5"
-        val command = GUICommand(1,text)
+        val text = getText
+        val command = GUICommand(this,1,text)
         println("Sending Command " + command)
-        listener ! GUICommand(1, text)
+        listener ! command
       }
-      
+      setKeymap(keymap)
       //Bind the other commands
     }
     
