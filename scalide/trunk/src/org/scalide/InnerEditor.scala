@@ -44,7 +44,7 @@ class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTe
       //Bind the other commands
     }
     
-    setFont(new Font("Consolas", 0, 12))
+    setFont(new Font("Courier New", 0, 12))
     setBorder(BorderFactory.createMatteBorder(0,0,1,2,Color.BLUE))
     setTabStops(this, 4)
   }
