@@ -4,7 +4,17 @@ class Scalide(private val args : Array[String]) {
   import scala.actors.Actor
   import Actor._
   import processors.ScalaProcessor
+  import org.scalide.utils.Props
   
+  //Load the properties
+  try {
+    Props.loadProps("scalide.properties")
+  } catch {
+  case e : java.io.IOException =>
+    System.err.println(e.toString)
+  }
+  
+  //Set up the actor for relaying messages back and forth
   val p : Actor = actor {
     import ScalideGUIMessages._
     import ScalideInterpreterMessages._

@@ -7,12 +7,11 @@ import java.awt.{Color, Dimension, Font, Event}
 import java.awt.event.{KeyEvent, ActionEvent}
 import scala.actors._
 import scalide.utils.BetterSwing._
+import scalide.utils.Props
 
 class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTextPane {
-  
+    
   swingLater {
-    
-    
     //Binds all the actions that we want
     {
       val keymap = JTextComponent.addKeymap("InnerEditorBindings", getKeymap())
@@ -44,7 +43,7 @@ class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTe
       //Bind the other commands
     }
     
-    setFont(new Font("Courier New", 0, 12))
+    setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, Props("InnerEditor.font.size", 12)))
     setBorder(BorderFactory.createMatteBorder(0,0,1,2,Color.BLUE))
     setTabStops(this, 4)
   }
