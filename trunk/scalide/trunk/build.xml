@@ -15,7 +15,9 @@
 	<property name="scala-compiler.jar" value="${scala.home}/lib/scala-compiler.jar" />
 
 	<target name="init">
-		<tstamp />
+		<tstamp>
+			<format property="STANDARD" pattern="yyyy-MM-dd_HH-mm-ss"/>
+		</tstamp>
 		<path id="build.classpath">
 			<pathelement location="${scala-library.jar}" />
 			<pathelement location="${scala-compiler.jar}" />
@@ -60,8 +62,8 @@
 		<mkJar jarname="scalide.jar" />
 	</target>
 
-	<target name="nightly">
-		<mkJar jarname="scalide-${DSTAMP}-${TSTAMP}.jar" />
+	<target name="nightly" depends="clean, build">
+		<mkJar jarname="scalide-${STANDARD}.jar" />
 	</target>
 
 </project>
