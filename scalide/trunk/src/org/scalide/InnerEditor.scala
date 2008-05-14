@@ -6,9 +6,12 @@ import javax.swing.text._
 import java.awt.{Color, Dimension, Font, Event}
 import java.awt.event.{KeyEvent, ActionEvent}
 import scala.actors._
+import scalide.utils.BetterSwing._
 
 class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTextPane {
+  
   swingLater {
+    
     
     //Binds all the actions that we want
     {
@@ -16,11 +19,9 @@ class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTe
     
       //Util method for binding an action to a key
       def bindAction(key : Int, mask : Int) (act : => Unit) {
-        println("Binding Action")
         val keystroke = KeyStroke.getKeyStroke(key, mask)
         val action = new AbstractAction {
           override def actionPerformed(e : ActionEvent) {
-            println("Key Pressed")
             act
           }
         }
@@ -45,5 +46,6 @@ class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTe
     
     setFont(new Font("Consolas", 0, 12))
     setBorder(BorderFactory.createMatteBorder(0,0,1,2,Color.BLUE))
+    setTabStops(this, 4)
   }
 }
