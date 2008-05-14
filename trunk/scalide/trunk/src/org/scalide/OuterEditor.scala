@@ -31,7 +31,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
         e.consume
       }
     })
-    refresh
+    proc ! Refresh(editors)
   }
   
   def mkInnerEditor(isOut : Boolean) = {
@@ -43,34 +43,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
   }
   
   def start {
-    refresh
+    proc ! Refresh
   }
   
-  def refresh {
-    swingLater {
-      //Make a safe copy of the editors val 
-      //so that it does not change midway through
-      //Not sure if i have to do this, i don't
-      //understand generators well enough yet
-      val editors = this.editors
-      //Clear the component
-      this.setText("")
-      setCaretPosition(getDocument.getLength)
-      for (ed <- editors) {
-        val label = new JLabel(if (ed.isOut) "out " else "in ")
-        label.setForeground(Color.BLUE)
-        label.setFont(new Font("Consolas", 0, 10))
-        insertComponent(label)
-        insertComponent(ed)
-        getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
-      }
-      //Focus on the active editor
-      focused match {
-      case Some(x) => x.grabFocus
-      case None =>
-      }
-    }
-  }
+  case class Refresh(editors : List[InnerEditor])
+
   
   val proc : Actor = actor {
     loop {
@@ -109,7 +86,28 @@ class OuterEditor(listener : Actor) extends JTextPane {
           focused = Some(editors.last)
         }
         println("Editors " + editors.size)
-        refresh
+        proc ! Refresh(editors)
+      case Refresh(editors) =>
+        def refresh(editors : List[InnerEditor]) {
+          swingLater {
+            this.setText("")
+            setCaretPosition(getDocument.getLength)
+            for (ed <- editors) {
+              val label = new JLabel(if (ed.isOut) "out " else "in ")
+              label.setForeground(Color.BLUE)
+              label.setFont(new Font("Consolas", 0, 10))
+              insertComponent(label)
+              insertComponent(ed)
+              getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
+            }
+            //Focus on the active editor
+            focused match {
+            case Some(x) => x.grabFocus
+            case None =>
+            }
+          }
+        }
+        refresh(editors)
       }
     }
   }
