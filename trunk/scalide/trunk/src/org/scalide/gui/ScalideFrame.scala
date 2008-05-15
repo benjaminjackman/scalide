@@ -1,4 +1,4 @@
-package org.scalide
+package org.scalide.gui
 
 
 import javax.swing._
@@ -6,7 +6,7 @@ import java.awt.{Color, Font, Dimension, BorderLayout}
 import scala.actors._
 import Actor._
 import org.scalide.utils._
-import ScalideInterpreterMessages._
+import core.InterpreterMessages._
 
 class ScalideFrame(private val p : Actor) extends JFrame {
   import BetterSwing._
@@ -43,8 +43,8 @@ class ScalideFrame(private val p : Actor) extends JFrame {
   //On startup add the gui task into the processor
   guiTask {
     def mkMenuBar = {
-      import ScalideGUIMessages._
-      new MenuBar{
+      import core.UserMessages._
+      new MenuBar {
         new Menu("File") {
           "New" does {p ! NewFile()}
           "Open Scalapad..." does {p ! OpenFile()}

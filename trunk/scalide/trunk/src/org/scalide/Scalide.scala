@@ -4,6 +4,7 @@ class Scalide(private val args : Array[String]) {
   import scala.actors.Actor
   import Actor._
   import processors.ScalaProcessor
+  import org.scalide.gui.ScalideFrame
   import org.scalide.utils.Props
   
   //Load the properties
@@ -16,11 +17,11 @@ class Scalide(private val args : Array[String]) {
   
   //Set up the actor for relaying messages back and forth
   val p : Actor = actor {
-    import ScalideGUIMessages._
-    import ScalideInterpreterMessages._
+    import core.UserMessages._
+    import core.InterpreterMessages._
       loop {
         receive {
-        case msg : ScalideGUIMessage => 
+        case msg : UserMessage => 
           msg match {
           case NewFile() => 
             println(msg)
@@ -30,10 +31,10 @@ class Scalide(private val args : Array[String]) {
             println(msg)
           case RestartInterpreter() => 
             interp.restart()
-          case cmd : GUICommand => 
+          case cmd : ProcessCell => 
             interp.process(cmd)
           }
-        case msg : ScalideInterpreterMessage => 
+        case msg : InterpreterMessage => 
           msg match {
           case res : InterpResult =>
             frame.process(res)
