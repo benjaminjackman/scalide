@@ -21,7 +21,7 @@ class Scalide(private val args : Array[String]) {
     import core.InterpreterMessages._
       loop {
         receive {
-        case msg : UserMessage => 
+        case msg : UserMessage =>
           msg match {
           case NewFile() => 
             println(msg)

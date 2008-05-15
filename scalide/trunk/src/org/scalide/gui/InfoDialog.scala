@@ -1,10 +1,17 @@
 package org.scalide.gui
 
 import javax.swing._
-class InfoDialog extends JDialog{
-  val body = new JTextArea
-  setSize(400,400)
-  add(body)
-  setModal(true)
-  setVisible(true)
+import utils.BetterSwing._
+class InfoDialog(title : String, text : String ) extends JDialog{
+  val body = new JTextPane()
+  swingLater {
+    setSize(400,400)
+    body.setContentType("text/html")
+    body.setEditable(false)
+    body.setText(text)
+    add(body)
+    setModal(true)
+    pack
+    setVisible(true)
+  }
 }

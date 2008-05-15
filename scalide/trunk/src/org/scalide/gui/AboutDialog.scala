@@ -1,7 +1,4 @@
 package org.scalide.gui
 
 import javax.swing._
-class AboutDialog extends InfoDialog {
-  setTitle("Scalide About")
-  body.setText(res.Messages.about)
-}
+class AboutDialog extends InfoDialog("Scalide About", res.Messages.about)
