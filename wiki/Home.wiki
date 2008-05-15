@@ -1,0 +1,17 @@
+===Scalide Google Code Wiki===
+The wiki page for Scalide
+
+= Introduction =
+
+Scalide is a visual frontend for the [http://www.scala-lang.org/ Scala Programming Language] interpreter. It is free and aims to make learning Scala an easier and faster experience.
+
+Check out the Scalide blog at: 
+http://scalide.blooger.com
+
+Discuss in the Scalide google group at:
+http://groups.google.com/group/scalide
+
+
+= Help =
+
+Press shift+enter inside a cell to evaluate it.
