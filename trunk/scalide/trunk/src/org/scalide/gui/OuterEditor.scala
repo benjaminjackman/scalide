@@ -70,16 +70,27 @@ class OuterEditor(listener : Actor) extends JTextPane {
     proc ! Refresh
   }
   
+  /* Generates a new code cell after the current one
+   */
+  
+  def mkCodeCell {
+    proc ! MakeCodeCell()
+  }
+  
+  case class MakeCodeCell
   case class Refresh(editors : List[EditorGroup])
 
   
   val proc : Actor = actor {
     loop {
       receive {
+      case MakeCodeCell() =>
+        
       case MOVE_FOCUS_UP() =>
-
         if (focused.isDefined) {
           val itr = editors.elements
+          //Neat little recursive method to get
+          //the previous value in a list
           def prevOf(curr : Option[EditorGroup]) : Option[EditorGroup] = {
             if (itr.hasNext) {
               val next = itr.next
@@ -102,6 +113,8 @@ class OuterEditor(listener : Actor) extends JTextPane {
         if (focused.isDefined) {
           val itr = editors.elements
           
+          //Neat little recursive function to get
+          //the next element in a list after the current one
           def nextOf(found : boolean) : Option[EditorGroup] = {
             if (itr.hasNext) {
               if (found) {

@@ -54,6 +54,9 @@ class ScalideFrame(private val p : Actor) extends JFrame {
         new Menu("Interpreter") {
           "Restart" does {p ! RestartInterpreter()}
         }	
+        new Menu("CodeCell") {
+          "New" does {editor.mkCodeCell}
+        }	
         new Menu("Help") {
           "Contents" does {p ! ShowHelpDialog()}
           ---
