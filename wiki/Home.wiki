@@ -19,4 +19,4 @@ Press shift+enter inside a cell to evaluate it.
 
 Press alt+up/down to move from cell to cell
 
-From the menubar select Interpreter > Restart to restart if anything goes wrong.
+From the menubar select Interpreter > Restart to restart if anything goes wrong or the interpreter starts acting weird.
