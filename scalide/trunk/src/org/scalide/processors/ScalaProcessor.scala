@@ -41,20 +41,31 @@ class ScalaProcessor(private val p : Actor) {
         case x =>
           val sb = new StringBuilder
           val c = x.asInstanceOf[Char]
-          println("Received: " + c)
           sb.append(c)
-          while (reader.ready) {
-            reader.read match {
-            case -1 =>
-              println("Pipe dead, exiting: 1")
-              handleResult(sb.toString)
-              exit
-            case x =>
-              val c = x.asInstanceOf[Char]
-              println("Received: " + c)
-              sb.append(c)
+          def readMore {
+            if (reader.ready) {
+              reader.read match {
+              case -1 =>
+                println("Pipe dead, exiting: 1")
+                handleResult(sb.toString)
+                exit
+              case x =>
+                val c = x.asInstanceOf[Char]
+                sb.append(c)
+              }
+            }
+            if (reader.ready) {
+              readMore
+            } else {
+              //Hack to fix issues with how the interpreter 
+              //flushes its outputs.
+              Thread.sleep(50)
+              if (reader.ready) {
+                readMore
+              }
             }
           }
+          readMore
           handleResult(sb.toString)
         }
       }
@@ -79,6 +90,15 @@ class ScalaProcessor(private val p : Actor) {
     loop {
       def restart {
         interp = mkInterpreter
+        def clear {
+          receiveWithin(0) {
+          case x : ProcessCell =>
+            println("Discarding " + x)
+            clear
+          case actors.TIMEOUT =>
+          }
+        }
+        clear
       }
       receive {
         case command : ProcessCell => 

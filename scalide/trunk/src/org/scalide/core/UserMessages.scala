@@ -6,5 +6,7 @@ object UserMessages {
   case class OpenFile extends UserMessage
   case class SaveFile extends UserMessage
   case class RestartInterpreter extends UserMessage
+  case class ShowHelpDialog extends UserMessage
+  case class ShowAboutDialog extends UserMessage
   case class ProcessCell(cell : CodeCell, requestId : Int, text : String) extends UserMessage
 }

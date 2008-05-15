@@ -31,6 +31,10 @@ class Scalide(private val args : Array[String]) {
             println(msg)
           case RestartInterpreter() => 
             interp.restart()
+          case ShowAboutDialog() =>
+            new gui.AboutDialog
+          case ShowHelpDialog() =>
+            new gui.HelpDialog
           case cmd : ProcessCell => 
             interp.process(cmd)
           }
