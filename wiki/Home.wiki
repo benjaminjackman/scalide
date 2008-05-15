@@ -7,7 +7,7 @@ The wiki page for Scalide
 Scalide is a visual frontend for the [http://www.scala-lang.org/ Scala Programming Language] interpreter. It is free and aims to make learning Scala an easier and faster experience.
 
 Check out the Scalide blog at: 
-http://scalide.blooger.com
+http://scalide.blogspot.com
 
 Discuss in the Scalide google group at:
 http://groups.google.com/group/scalide
