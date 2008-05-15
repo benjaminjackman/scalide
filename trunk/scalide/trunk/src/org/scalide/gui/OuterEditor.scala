@@ -8,7 +8,8 @@ import scala.actors._
 import Actor._
 import core.InterpreterMessages._
 import java.io.{StringReader}
-import utils.Props
+import utils.{Props, ScalideCollections}
+import ScalideCollections._
 
 class OuterEditor(listener : Actor) extends JTextPane {
 
@@ -88,22 +89,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
         
       case MOVE_FOCUS_UP() =>
         if (focused.isDefined) {
-          val itr = editors.elements
-          //Neat little recursive method to get
-          //the previous value in a list
-          def prevOf(curr : Option[EditorGroup]) : Option[EditorGroup] = {
-            if (itr.hasNext) {
-              val next = itr.next
-              if (next == focused.get) {
-                curr
-              } else {
-                prevOf(Some(next))
-              }
-            } else {
-              None
-            }
-          }
-          prevOf(None).foreach {
+          justBefore(editors.elements, focused.get ==).foreach {
             ed =>
             focused = Some(ed)
             swingLater{ed.editor.grabFocus}
@@ -111,22 +97,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
         }
       case MOVE_FOCUS_DOWN() =>
         if (focused.isDefined) {
-          val itr = editors.elements
-          
-          //Neat little recursive function to get
-          //the next element in a list after the current one
-          def nextOf(found : boolean) : Option[EditorGroup] = {
-            if (itr.hasNext) {
-              if (found) {
-                Some(itr.next)
-              } else {
-                nextOf(itr.next == focused.get)
-              }
-            } else {
-              None
-            }
-          }	
-          nextOf(false).foreach {
+          justAfter(editors.elements, focused.get ==).foreach {
             ed =>
             focused = Some(ed)
             swingLater{ed.editor.grabFocus}
