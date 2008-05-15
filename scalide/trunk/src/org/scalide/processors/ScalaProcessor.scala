@@ -1,8 +1,8 @@
 package org.scalide.processors
 
 import scala.actors.{InputChannel, OutputChannel}
-import ScalideGUIMessages._
-import ScalideInterpreterMessages._
+import core.UserMessages._
+import core.InterpreterMessages._
 import scala.actors.Actor
 import Actor._
 import java.io.{PrintWriter, PipedWriter, PipedReader}
@@ -71,7 +71,7 @@ class ScalaProcessor(private val p : Actor) {
      commandProc ! Restart
   }
   
-  private[scalide] def process(cmd : GUICommand) {
+  private[scalide] def process(cmd : ProcessCell) {
     commandProc ! cmd
   }
 
@@ -81,7 +81,7 @@ class ScalaProcessor(private val p : Actor) {
         interp = mkInterpreter
       }
       receive {
-        case command : GUICommand => 
+        case command : ProcessCell => 
           interp.interpret(command.text)
           receive {
           case ResultText(text) =>

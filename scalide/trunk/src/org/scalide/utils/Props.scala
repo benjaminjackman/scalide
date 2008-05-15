@@ -9,10 +9,10 @@ object Props extends PropertiesParser {
   def loadProps(file : String) {
     import scala.io.Source
     import scala.util.matching.Regex
-    val regex = new Regex("""\s*(.*)=\s*(.*)\s*""", "key", "value")
+    val setting = new Regex("""\s*(.*)=\s*(.*)\s*""", "key", "value")
     def parse(line : String) : Option[Pair[String,String]] = {
       line match { 
-      case `regex`(key, value) => 
+      case `setting`(key, value) => 
         Some((key,value)) 
       case _ => 
         None

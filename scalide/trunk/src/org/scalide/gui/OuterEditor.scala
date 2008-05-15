@@ -1,4 +1,4 @@
-package org.scalide
+package org.scalide.gui
 
 import javax.swing._
 import org.scalide.utils.BetterSwing._
@@ -6,7 +6,7 @@ import java.awt.{Color, Dimension, Font}
 import java.awt.event.{KeyListener, KeyEvent}
 import scala.actors._
 import Actor._
-import ScalideInterpreterMessages._
+import core.InterpreterMessages._
 import java.io.{StringReader}
 
 class OuterEditor(listener : Actor) extends JTextPane {
@@ -75,7 +75,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
             }
           } else {
             println("Found Editor")
-            if (ed == res.cmd.editor) {
+            if (ed.cell == res.cmd.cell) {
               foundIt = true
               }
             ed::Nil

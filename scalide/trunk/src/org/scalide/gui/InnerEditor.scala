@@ -1,6 +1,6 @@
-package org.scalide
+package org.scalide.gui
 
-import org.scalide.utils.BetterSwing._
+import scalide.utils.BetterSwing._
 import javax.swing._
 import javax.swing.text._
 import java.awt.{Color, Dimension, Font, Event}
@@ -8,9 +8,12 @@ import java.awt.event.{KeyEvent, ActionEvent}
 import scala.actors._
 import scalide.utils.BetterSwing._
 import scalide.utils.Props
+import scalide.core._
 
 class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTextPane {
-    
+  
+  val cell = new CodeCell
+  
   swingLater {
     //Binds all the actions that we want
     {
@@ -32,10 +35,10 @@ class InnerEditor(private val listener : Actor, var isOut : Boolean) extends JTe
       
       //Bind the execute command
       bindAction(VK_ENTER, SHIFT_MASK) {
-        import org.scalide.ScalideGUIMessages._
+        import core.UserMessages._
         
         val text = getText
-        val command = GUICommand(this,1,text)
+        val command = ProcessCell(cell,1,text)
         println("Sending Command " + command)
         listener ! command
       }
