@@ -1,0 +1,25 @@
+#summary One-sentence summary of this page.
+#labels Featured
+Scalide Google Code Wiki.
+discuss at groups.google.com/group/scalide
+
+= Introduction =
+
+Scalide is a visual frontend for the scala interpreter. It is free and aims to make learning scala an easier and faster experience.
+
+Check out the Scalide blog at: 
+http://scalide.blooger.com
+
+Discuss in the Scalide google group at:
+http://groups.google.com/group/scalide
+
+
+= Details =
+
+Press shift+enter inside a cell to evaluate it.
+
+
+#Add your content here.  Format your content with:
+#  * Text in *bold* or _italic_
+#  * Headings, paragraphs, and lists
+#  * Automatic links to other wiki pages
