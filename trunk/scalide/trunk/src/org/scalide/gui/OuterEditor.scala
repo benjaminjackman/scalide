@@ -27,10 +27,10 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val relay = actor {
     loop {
       react {
-        case MOVE_FOCUS_UP  =>
-          proc ! MOVE_FOCUS_UP
-        case MOVE_FOCUS_DOWN =>
-          proc ! MOVE_FOCUS_DOWN
+        case MOVE_FOCUS_UP()  =>
+          proc ! MOVE_FOCUS_UP()
+        case MOVE_FOCUS_DOWN() =>
+          proc ! MOVE_FOCUS_DOWN()
         case x =>
           listener forward x
       }
@@ -76,7 +76,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val proc : Actor = actor {
     loop {
       receive {
-      case MOVE_FOCUS_UP =>
+      case MOVE_FOCUS_UP() =>
 
         if (focused.isDefined) {
           val itr = editors.elements
@@ -98,7 +98,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
             swingLater{ed.editor.grabFocus}
           }
         }
-      case MOVE_FOCUS_DOWN =>
+      case MOVE_FOCUS_DOWN() =>
         if (focused.isDefined) {
           val itr = editors.elements
           

@@ -46,18 +46,18 @@ class ScalideFrame(private val p : Actor) extends JFrame {
       import core.UserMessages._
       new MenuBar {
         new Menu("File") {
-          "New" does {p ! NewFile}
-          "Open Scalapad..." does {p ! OpenFile}
+          "New" does {p ! NewFile()}
+          "Open Scalapad..." does {p ! OpenFile()}
           ---
-          "Save" does {p ! SaveFile}
+          "Save" does {p ! SaveFile()}
         }
         new Menu("Interpreter") {
-          "Restart" does {p ! RestartInterpreter}
+          "Restart" does {p ! RestartInterpreter()}
         }	
         new Menu("Help") {
-          "Contents" does {p ! ShowHelpDialog}
+          "Contents" does {p ! ShowHelpDialog()}
           ---
-          "About" does {p ! ShowAboutDialog}
+          "About" does {p ! ShowAboutDialog()}
         }	
       }
     }

@@ -41,12 +41,12 @@ class CodeCellEditor(private val listener : Actor, var isOut : Boolean) extends 
       //Bind the execute command
       bindAction(VK_UP, ALT_MASK) {
         //Jump up one cell
-        listener ! MOVE_FOCUS_UP
+        listener ! MOVE_FOCUS_UP()
       }
       
       bindAction(VK_DOWN, ALT_MASK) {
         //Jump down one cell
-        listener ! MOVE_FOCUS_DOWN
+        listener ! MOVE_FOCUS_DOWN()
       }
       
       bindAction(VK_ENTER, SHIFT_MASK) {
