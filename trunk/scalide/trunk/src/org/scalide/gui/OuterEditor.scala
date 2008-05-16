@@ -13,15 +13,18 @@ import ScalideCollections._
 
 class OuterEditor(listener : Actor) extends JTextPane {
 
+  //An editor group consists of an editor and the code for it
   class EditorGroup(val out : Boolean) extends JPanel {
     val editor = new CodeCellEditor(relay, out)
     val label = new JLabel(if (editor.isOut) "out " else "in ")
-    label.setForeground(Color.BLUE)
-    label.setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, 10))
-    label.setOpaque(false)
-    setLayout(new BorderLayout)
-    this.add(editor, BorderLayout.CENTER)
-    this.add(label, BorderLayout.WEST)
+    swingLater {
+      label.setForeground(Color.BLUE)
+      label.setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, 10))
+      label.setOpaque(false)
+      setLayout(new BorderLayout)
+      this.add(editor, BorderLayout.CENTER)
+      this.add(label, BorderLayout.WEST)
+    }
  }
 
   
@@ -37,10 +40,6 @@ class OuterEditor(listener : Actor) extends JTextPane {
       }
     }
   }
-  
-  var editors = List[EditorGroup](new EditorGroup(false))
-  var focused : Option[EditorGroup] = Some(editors.first)
-
   
   swingLater {
     println("Making Panel " + Thread.currentThread)
@@ -60,7 +59,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
       }
     })
      */
-    proc ! Refresh(editors)
+    proc ! Refresh()
   }
   
   def process(res : InterpResult) {
@@ -68,7 +67,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   }
   
   def start {
-    proc ! Refresh
+    proc ! Refresh()
   }
   
   /* Generates a new code cell after the current one
@@ -79,10 +78,13 @@ class OuterEditor(listener : Actor) extends JTextPane {
   }
   
   case class MakeCodeCell
-  case class Refresh(editors : List[EditorGroup])
+  case class Refresh()
 
   
   val proc : Actor = actor {
+    var editors = List[EditorGroup](new EditorGroup(false))
+    var focused : Option[EditorGroup] = Some(editors.first)
+
     loop {
       receive {
       case MakeCodeCell() =>
@@ -114,8 +116,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
         editors = editors.flatMap { 
           ed =>
           if (insertedIt) {
+            //Return just the editor after we have already inserted
             ed::Nil
           } else if (foundIt) {
+            //Now we are going to insert the editor since 
+            //we have just found the old one
             insertedIt = true
             if (ed.editor.isOut) {
               println("Inserting result to out editor")
@@ -138,25 +143,23 @@ class OuterEditor(listener : Actor) extends JTextPane {
           editors = editors:::mkNew::newEd::Nil
           focused = Some(newEd)
         }
-        println("Editors " + editors.size)
-        proc ! Refresh(editors)
-      case Refresh(editors) =>
-        def refresh(editors : List[EditorGroup]) {
-          swingLater {
-            this.setText("")
-            setCaretPosition(getDocument.getLength)
-            for (ed <- editors) {
-              insertComponent(ed)
-              getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
-            }
-            //Focus on the active editor
-            focused match {
-            case Some(ed) => ed.editor.grabFocus
-            case None =>
-            }
+        //Be sure to refresh the view after we change the list
+        proc ! Refresh()
+      case Refresh() =>
+        val eds = editors
+        swingLater {
+          //Clear this window
+          this.setText("")
+          //Set the caret to the end of the document
+          setCaretPosition(getDocument.getLength)
+          eds.foreach { 
+            ed =>
+            insertComponent(ed)
+            getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
           }
+          //Focus on the active editor
+          focused.foreach(_.editor.grabFocus)
         }
-        refresh(editors)
       }
     }
   }
