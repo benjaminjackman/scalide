@@ -33,7 +33,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
         new FocusListener {
           def focusLost(e : FocusEvent) {}
           def focusGained(e : FocusEvent) {
-            println("focus gained" + editor.getText)
+            println("focus gained" + editor)
             proc ! ChangeFocus(Some(EditorGroup.this))
           }
         }
@@ -73,8 +73,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
   def mvFocusUp {proc ! MoveFocusUp() }
   def mvFocusDown {proc ! MoveFocusDown() }
   def load(xml : scala.xml.Elem) {proc ! Load(xml)}
-
+  def interpret {proc ! InterpretCurrent()}
+  def interpretAll {proc ! InterpretAll()}
   
+  case class InterpretCurrent
+  case class InterpretAll
   case class MakeCodeCell
   case class Refresh
   case class Save(promptForFile : Boolean)
@@ -89,7 +92,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val proc : Actor = actor {
     var editors = List[EditorGroup](new EditorGroup(false))
     var focused : Option[EditorGroup] = Some(editors.first)
-
+    var i = 0
     loop {
       def generateSaveXML = {
         (<Scalapad version={version.toString}>
@@ -103,11 +106,25 @@ class OuterEditor(listener : Actor) extends JTextPane {
         }}
         </Scalapad>)
       }
+      def interpret(ed : EditorGroup) = {
+        swingLater { 
+          import core.UserMessages._
+          val text = ed.editor.getText
+          val command = ProcessCell(ed.editor.cell,1,text)
+          println("Sending Command " + command)
+          process(command)
+        } 
+      }
       receive {
+      case InterpretCurrent() =>
+        focused foreach {interpret _}
+      case InterpretAll() =>
+        editors foreach {interpret _}
       case ChangeFocus(ed)=>
         focused = ed
       case Save(prompt) =>
         val s = generateSaveXML
+        println(s)
         listener ! SaveData(s, prompt)
       case Load(xml) =>
         println("Loading:")
@@ -143,16 +160,12 @@ class OuterEditor(listener : Actor) extends JTextPane {
         val newEd = new EditorGroup(false);
         editors = focused match {
         case Some(ed) =>
-          val (head,tail) = editors.partition(ed==)
-          head:::{tail match {
-          case x::xs =>
-            x::newEd::xs
-          case Nil =>
-            newEd::Nil
-          }}
+          editors:::newEd::Nil
         case None =>
           editors:::newEd::Nil
         }
+        focused = Some(newEd)
+        swingLater{newEd.grabFocus}
         proc ! Refresh()
       case MoveFocusUp() =>
         if (focused.isDefined) {

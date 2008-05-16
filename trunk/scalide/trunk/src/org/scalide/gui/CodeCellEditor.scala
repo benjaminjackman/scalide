@@ -66,12 +66,7 @@ class CodeCellEditor(private val outEd : OuterEditor,  private var isOut_ : Bool
       }
       
       bindAction(VK_ENTER, SHIFT_MASK) {
-        import core.UserMessages._
-        
-        val text = getText
-        val command = ProcessCell(cell,1,text)
-        println("Sending Command " + command)
-       outEd.process(command)
+        outEd.interpret
       }
       setKeymap(keymap)
       //Bind the other commands

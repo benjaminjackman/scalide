@@ -45,25 +45,27 @@ class ScalideFrame(private val p : Actor) extends JFrame {
       import core.UserMessages._
       val mb = new MenuBar {
         new Menu("File") {
-          "New" does {p ! NewFile()}
+//          "New" does {p ! NewFile()}
           "Open Scalapad..." does {p ! OpenFile()}
           ---
-          "Save Scalapad            Ctrl+S" does {editor.save(false)}
+          "Save Scalapad                Ctrl+S" does {editor.save(false)}
           "Save As Scalapad..." does {editor.save(true)}
-          ---
-          "Import Script..."
-          ---
-          "Export Script" does {}
-          "Export As Script..." does {}
+//          ---
+//          "Import Script..." does {}
+//          ---
+//          "Export Script" does {}
+//          "Export As Script..." does {}
         }
         new Menu("Interpreter") {
-          "Restart                  Ctrl+R" does {p ! RestartInterpreter()}
+          "Interpret               Shift+Enter" does {editor.interpret}
+          "Interpret All      Ctrl+Shift+Enter" does {editor.interpretAll}
+          "Restart                      Ctrl+R" does {p ! RestartInterpreter()}
         }	
         new Menu("CodeCell") {
-          "New                      Ctrl+N" does {editor.mkCodeCell}
+          "New                          Ctrl+N" does {editor.mkCodeCell}
         }	
         new Menu("Help") {
-          "Contents                 F1" does {p ! ShowHelpDialog()}
+          "Contents                         F1" does {p ! ShowHelpDialog()}
           ---
           "About" does {p ! ShowAboutDialog()}
         }	

@@ -97,7 +97,7 @@ class Scalide(private val args : Array[String]) {
             case e=>
             }
           }
-          if (currentSaveName.isDefined) {
+          if (currentSaveName.isEmpty || prompt) {
             actor {
               mkFileChooser(_.showSaveDialog(frame)) {
                 f => 
