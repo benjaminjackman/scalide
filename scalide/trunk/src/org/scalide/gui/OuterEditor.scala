@@ -3,43 +3,44 @@ package org.scalide.gui
 import javax.swing._
 import org.scalide.utils.BetterSwing._
 import java.awt.{Color, Dimension, Font, BorderLayout}
-import java.awt.event.{KeyListener, KeyEvent}
+import java.awt.event.{KeyListener, KeyEvent, FocusListener, FocusEvent}
 import scala.actors._
 import Actor._
 import core.InterpreterMessages._
+import core.UserMessages._
 import java.io.{StringReader}
 import utils.{Props, ScalideCollections}
 import ScalideCollections._
 
 class OuterEditor(listener : Actor) extends JTextPane {
+  
+  val version = 5
 
   //An editor group consists of an editor and the code for it
-  class EditorGroup(val out : Boolean) extends JPanel {
-    val editor = new CodeCellEditor(relay, out)
+  class EditorGroup(val isOut : Boolean, val text : String) extends JPanel {
+    def this(isOut : Boolean) = this (isOut, "")
+    val editor = new CodeCellEditor(OuterEditor.this, isOut)
     val label = new JLabel(if (editor.isOut) "out " else "in ")
     swingLater {
+      editor.setText(text)
       label.setForeground(Color.BLUE)
       label.setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, 10))
       label.setOpaque(false)
       setLayout(new BorderLayout)
       this.add(editor, BorderLayout.CENTER)
       this.add(label, BorderLayout.WEST)
+      editor.addFocusListener { 
+        new FocusListener {
+          def focusLost(e : FocusEvent) {}
+          def focusGained(e : FocusEvent) {
+            println("focus gained" + editor.getText)
+            proc ! ChangeFocus(Some(EditorGroup.this))
+          }
+        }
+      } 
     }
  }
 
-  
-  val relay = actor {
-    loop {
-      react {
-        case MOVE_FOCUS_UP()  =>
-          proc ! MOVE_FOCUS_UP()
-        case MOVE_FOCUS_DOWN() =>
-          proc ! MOVE_FOCUS_DOWN()
-        case x =>
-          listener forward x
-      }
-    }
-  }
   
   swingLater {
     println("Making Panel " + Thread.currentThread)
@@ -62,23 +63,27 @@ class OuterEditor(listener : Actor) extends JTextPane {
     proc ! Refresh()
   }
   
-  def process(res : InterpResult) {
-    proc ! res
-  }
-  
-  def start {
-    proc ! Refresh()
-  }
-  
-  /* Generates a new code cell after the current one
-   */
-  
-  def mkCodeCell {
-    proc ! MakeCodeCell()
-  }
+  def process(res : InterpResult) {proc ! res}
+  def process(cmd : ProcessCell) {listener ! cmd}
+  def start {proc ! Refresh()}
+  def save {proc ! Save()}
+  def help {listener ! ShowHelpDialog()}
+  def restart {listener ! RestartInterpreter()}
+  def mkCodeCell {proc ! MakeCodeCell()}
+  def mvFocusUp {proc ! MoveFocusUp() }
+  def mvFocusDown {proc ! MoveFocusDown() }
+  def load(xml : scala.xml.Elem) {proc ! Load(xml)}
+
   
   case class MakeCodeCell
-  case class Refresh()
+  case class Refresh
+  case class Save
+  case class Load(xml : scala.xml.Elem)
+  
+  class CodeCellAction
+  case class MoveFocusUp extends CodeCellAction
+  case class MoveFocusDown extends CodeCellAction
+  case class ChangeFocus(ed : Option[EditorGroup])
 
   
   val proc : Actor = actor {
@@ -86,10 +91,71 @@ class OuterEditor(listener : Actor) extends JTextPane {
     var focused : Option[EditorGroup] = Some(editors.first)
 
     loop {
+      def generateSaveXML = {
+        (<Scalapad version={version.toString}>
+         {for (ed <- editors) yield {
+          (<CodeCell isOut={ed.editor.isOut.toString} isFocus={
+            (focused match {
+            case Some(x) => x==ed
+            case None => false
+            }).toString
+          }>{ed.editor.getText}</CodeCell>)
+        }}
+        </Scalapad>)
+      }
       receive {
+      case ChangeFocus(ed)=>
+        focused = ed
+      case Save() =>
+        val s = generateSaveXML
+        listener ! SaveData(s)
+        println("Saving:" + s)
+      case Load(xml) =>
+        println("Loading:")
+        println(xml)
+        val newEds = xml\"CodeCell" map {
+          cell=>
+          //determine if this is an out cell, default to false when we have no elements
+          val isOut : Boolean = (cell\"@isOut").foldRight(false){
+            (x,y) =>
+            try {x.text.toBoolean} catch {case e=>false}
+          }
+          val isFocus : Boolean = (cell\"@isFocus").foldRight(false){
+            (x,y) =>
+            try {x.text.toBoolean} catch {case e=>false}
+          }
+          println("Cell:" + cell.text)
+          val ed = new EditorGroup(isOut, cell.text)
+          if (isFocus) {
+            focused = Some(ed)
+            swingLater{ed.grabFocus}
+          }
+          ed
+        } toList match {
+        case Nil =>
+          //Do nothing when we parse an empty list
+        case xs =>
+          println(xs)
+          editors = xs
+        }
+        proc ! Refresh()
       case MakeCodeCell() =>
-        
-      case MOVE_FOCUS_UP() =>
+        println("Making code cell")
+        val newEd = new EditorGroup(false);
+        editors = focused match {
+        case Some(ed) =>
+          val (head,tail) = editors.partition(ed==)
+          head:::{tail match {
+          case x::xs =>
+            x::newEd::xs
+          case Nil =>
+            newEd::Nil
+          }}
+        case None =>
+          editors:::newEd::Nil
+        }
+        proc ! Refresh()
+      case MoveFocusUp() =>
         if (focused.isDefined) {
           justBefore(editors.elements, focused.get ==).foreach {
             ed =>
@@ -97,7 +163,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
             swingLater{ed.editor.grabFocus}
           }
         }
-      case MOVE_FOCUS_DOWN() =>
+      case MoveFocusDown() =>
         if (focused.isDefined) {
           justAfter(editors.elements, focused.get ==).foreach {
             ed =>

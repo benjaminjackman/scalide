@@ -32,9 +32,8 @@ class ScalideFrame(private val p : Actor) extends JFrame {
     }
   }
   
-  def process(res : InterpResult) {
-    proc ! res
-  }
+  def process(res : InterpResult) {proc ! res}
+  def load(data : scala.xml.Elem) {editor.load(data)}
   
   private def guiTask(task : => Unit ) {
     proc ! GUITask(() => task)
@@ -44,25 +43,33 @@ class ScalideFrame(private val p : Actor) extends JFrame {
   guiTask {
     def mkMenuBar = {
       import core.UserMessages._
-      new MenuBar {
+      val mb = new MenuBar {
         new Menu("File") {
           "New" does {p ! NewFile()}
           "Open Scalapad..." does {p ! OpenFile()}
           ---
-          "Save" does {p ! SaveFile()}
+          "Save Scalapad            Ctrl+S" does {editor.save}
+          "Save As Scalapad..." does {editor.save}
+          ---
+          "Import Script..."
+          ---
+          "Export Script" does {}
+          "Export As Script..." does {}
         }
         new Menu("Interpreter") {
-          "Restart" does {p ! RestartInterpreter()}
+          "Restart                  Ctrl+R" does {p ! RestartInterpreter()}
         }	
         new Menu("CodeCell") {
-          "New" does {editor.mkCodeCell}
+          "New                      Ctrl+N" does {editor.mkCodeCell}
         }	
         new Menu("Help") {
-          "Contents" does {p ! ShowHelpDialog()}
+          "Contents                 F1" does {p ! ShowHelpDialog()}
           ---
           "About" does {p ! ShowAboutDialog()}
         }	
       }
+      mb.setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, 10))
+      mb
     }
     
     println("Making Frame " + Thread.currentThread)

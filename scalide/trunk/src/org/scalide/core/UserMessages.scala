@@ -9,4 +9,6 @@ object UserMessages {
   case class ShowHelpDialog extends UserMessage
   case class ShowAboutDialog extends UserMessage
   case class ProcessCell(cell : CodeCell, requestId : Int, text : String) extends UserMessage
+  //The data that we use to actually save
+  case class SaveData(xml : scala.xml.Elem) extends UserMessage
 }
