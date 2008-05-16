@@ -10,14 +10,12 @@ import scalide.utils.BetterSwing._
 import scalide.utils.Props
 import scalide.core._
 
-class CodeCellEditorAction
-case class MOVE_FOCUS_UP extends CodeCellEditorAction
-case class MOVE_FOCUS_DOWN extends CodeCellEditorAction
 
-class CodeCellEditor(private val listener : Actor, var isOut : Boolean) extends JTextPane {
+class CodeCellEditor(private val outEd : OuterEditor,  private var isOut_ : Boolean) extends JTextPane {
   
   val cell = new CodeCell
   
+  def isOut = isOut_
   
   swingLater {
     //Binds all the actions that we want
@@ -38,15 +36,33 @@ class CodeCellEditor(private val listener : Actor, var isOut : Boolean) extends 
       import KeyEvent._;
       import Event._;
       
+      //Bind the save action
+      bindAction(VK_S, CTRL_MASK) {
+        outEd.save
+      }
+      
+      bindAction(VK_R, CTRL_MASK) {
+        outEd.restart
+      }
+      
+      bindAction(VK_F1, 0) {
+        outEd.help
+      }
+      
       //Bind the execute command
+      bindAction(VK_N, CTRL_MASK) {
+        //Jump up one cell
+        outEd.mkCodeCell
+      }
+      
       bindAction(VK_UP, ALT_MASK) {
         //Jump up one cell
-        listener ! MOVE_FOCUS_UP()
+        outEd.mvFocusUp
       }
       
       bindAction(VK_DOWN, ALT_MASK) {
         //Jump down one cell
-        listener ! MOVE_FOCUS_DOWN()
+        outEd.mvFocusDown
       }
       
       bindAction(VK_ENTER, SHIFT_MASK) {
@@ -55,7 +71,7 @@ class CodeCellEditor(private val listener : Actor, var isOut : Boolean) extends 
         val text = getText
         val command = ProcessCell(cell,1,text)
         println("Sending Command " + command)
-        listener ! command
+       outEd.process(command)
       }
       setKeymap(keymap)
       //Bind the other commands
