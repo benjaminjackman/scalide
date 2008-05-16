@@ -17,6 +17,7 @@ class Scalide(private val args : Array[String]) {
   
   //Set up the actor for relaying messages back and forth
   val p : Actor = actor {
+    var currentSaveName : Option[String] = None
     import core.UserMessages._
     import core.InterpreterMessages._
       loop {
@@ -79,17 +80,31 @@ class Scalide(private val args : Array[String]) {
             }
           case cmd : ProcessCell => 
             interp.process(cmd)
-          case SaveData(data) =>
-            actor {
-              mkFileChooser(_.showSaveDialog(frame)) {
-                f => 
-                actor {
-                  val fn = {
-                    val fn = f.getAbsolutePath; 
-                    if (fn.endsWith(".scalapad")) fn else fn + ".scalapad"
+          case SaveData(data, prompt) =>
+            def save(filename : String) {
+              try {
+                scala.xml.XML.saveFull(filename, data, "UTF-8", true, null)                
+              } catch {
+              case e=>
+              }
+            }
+            if (currentSaveName.isDefined) {
+              actor {
+                mkFileChooser(_.showSaveDialog(frame)) {
+                  f => 
+                  actor {
+                    val fn = {
+                      val fn = f.getAbsolutePath; 
+                      if (fn.endsWith(".scalapad")) fn else fn + ".scalapad"
+                    }
+                    save(fn)
                   }
-                  scala.xml.XML.saveFull(fn, data, "UTF-8", true, null)
                 }
+              }
+            } else {
+              val filename = currentSaveName.get 
+              actor {
+                save(filename)
               }
             }
           }

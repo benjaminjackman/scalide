@@ -66,7 +66,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   def process(res : InterpResult) {proc ! res}
   def process(cmd : ProcessCell) {listener ! cmd}
   def start {proc ! Refresh()}
-  def save {proc ! Save()}
+  def save (promptForFile : boolean ){proc ! Save(promptForFile)}
   def help {listener ! ShowHelpDialog()}
   def restart {listener ! RestartInterpreter()}
   def mkCodeCell {proc ! MakeCodeCell()}
@@ -77,7 +77,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   
   case class MakeCodeCell
   case class Refresh
-  case class Save
+  case class Save(promptForFile : Boolean)
   case class Load(xml : scala.xml.Elem)
   
   class CodeCellAction
@@ -106,10 +106,9 @@ class OuterEditor(listener : Actor) extends JTextPane {
       receive {
       case ChangeFocus(ed)=>
         focused = ed
-      case Save() =>
+      case Save(prompt) =>
         val s = generateSaveXML
-        listener ! SaveData(s)
-        println("Saving:" + s)
+        listener ! SaveData(s, prompt)
       case Load(xml) =>
         println("Loading:")
         println(xml)
