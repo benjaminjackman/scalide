@@ -38,7 +38,7 @@ class CodeCellEditor(private val outEd : OuterEditor,  private var isOut_ : Bool
       
       //Bind the save action
       bindAction(VK_S, CTRL_MASK) {
-        outEd.save
+        outEd.save(false)
       }
       
       bindAction(VK_R, CTRL_MASK) {

@@ -48,8 +48,8 @@ class ScalideFrame(private val p : Actor) extends JFrame {
           "New" does {p ! NewFile()}
           "Open Scalapad..." does {p ! OpenFile()}
           ---
-          "Save Scalapad            Ctrl+S" does {editor.save}
-          "Save As Scalapad..." does {editor.save}
+          "Save Scalapad            Ctrl+S" does {editor.save(false)}
+          "Save As Scalapad..." does {editor.save(true)}
           ---
           "Import Script..."
           ---
