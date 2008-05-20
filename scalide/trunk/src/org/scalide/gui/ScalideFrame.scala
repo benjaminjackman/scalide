@@ -21,7 +21,6 @@ class ScalideFrame(private val p : Actor) extends JFrame {
         SwingUtilities.invokeLater(
           new Runnable() {
             def run {
-              println(Thread.currentThread)
               fn()
             }
           }
@@ -74,7 +73,6 @@ class ScalideFrame(private val p : Actor) extends JFrame {
       mb
     }
     
-    println("Making Frame " + Thread.currentThread)
     //Set up the frame
     setJMenuBar(mkMenuBar)
     setTitle("Scalide")
