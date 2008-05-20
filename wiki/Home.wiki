@@ -25,6 +25,6 @@ From the menubar select Interpreter > Restart or press ctrl+R to restart if anyt
 
 Standard out does not display in the result boxes for the interpreter, instead it is placed in the command line where the interpreter was started from. In a future version I plan to add a console window and attempt to associate output with the command that generated it, if anyone wants it. *Deeper explanation* _the primary problem with including the output of a print command there is that it is not routed directly through the interpreter and so it becomes pretty difficult to determine which command generated the std::out in most circumstances. There are some novel work arounds that I have read about on the web and I will look into them and see if I can come up with a solution. As long as the prints are not placed on a different thread it should be possible to associate them with the correct command, however if that does not happen then there could be issues, and results could start to appear garbled._
 
-~~There is no way to delete cells. This will be fixed in an upcoming release, probably with the keyboard shortcut ctrl+del.~~
+~~There is no way to delete cells. This will be fixed in an upcoming release, probably with the keyboard shortcut ctrl+del.~~ Press Ctrl+Delete
 
 The interpreter hangs sometimes, please post issues when this happens and I will look into it. In the mean time i suggest that you restart with ctrl+r or Interpreter > Restart. and re-evaluate the cells you need to get back to the execution state that you previously were at.
