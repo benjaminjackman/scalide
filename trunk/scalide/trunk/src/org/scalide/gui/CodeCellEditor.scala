@@ -11,11 +11,13 @@ import scalide.utils.Props
 import scalide.core._
 
 
-class CodeCellEditor(private val outEd : OuterEditor,  private var isOut_ : Boolean) extends JTextPane {
+class CodeCellEditor(private val outEd : OuterEditor,  var isOut : Boolean) extends JTextPane {
   
   val cell = new CodeCell
   
-  def isOut = isOut_
+  def isOut_(isOut : Boolean) {
+    this.isOut = isOut 
+  }
   
   swingLater {
     //Binds all the actions that we want

@@ -8,68 +8,10 @@ import Actor._
 import java.io.{PrintWriter, PipedWriter, PipedReader}
 class ScalaProcessor(private val p : Actor) {
 
-  
   import scala.tools.nsc.{Interpreter, Settings, InterpreterResults}
-  
-  /**Processes the messages received from the 
-   * interpreter and sends a message to the 
-   * appropriate actor
-   */
-  
-  /*
-  private def mkPipe = {
-    val pipe = new PipedWriter
-    val writer = new PrintWriter(pipe)
-    val reader = new PipedReader
-    pipe.connect(reader)
-    actor {
-      loop {
-        println("Awaiting Input")
-        reader.read match {
-        case -1 =>
-          //We are done with this actor, we can exit it
-          println("Pipe dead, exiting: 0")
-          exit
-        case x =>
-          val sb = new StringBuilder
-          val c = x.asInstanceOf[Char]
-          sb.append(c)
-          def readMore {
-            if (reader.ready) {
-              reader.read match {
-              case -1 =>
-                println("Pipe dead, exiting: 1")
-                handleResult(sb.toString)
-                exit
-              case x =>
-                val c = x.asInstanceOf[Char]
-                sb.append(c)
-              }
-            }
-            if (reader.ready) {
-              readMore
-            } else {
-              //Hack to fix issues with how the interpreter 
-              //flushes its outputs.
-              Thread.sleep(50)
-              if (reader.ready) {
-                readMore
-              }
-            }
-          }
-          readMore
-          handleResult(sb.toString)
-        }
-      }
-    }
-    writer
-  }
-   */
   
   case class ResultText(res : String)
   case class Restart
-
-
   
   private[scalide] def restart() {
      commandProc ! Restart
@@ -157,7 +99,7 @@ class ScalaProcessor(private val p : Actor) {
           case Success | Error =>
             def getResult : String = {
               if (interp.hasResult) {
-                interp.getResult
+                interp.getResult.stripLineEnd
               } else {
                 "<No Result>"
               }
