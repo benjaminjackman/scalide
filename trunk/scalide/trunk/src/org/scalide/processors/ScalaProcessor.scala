@@ -91,7 +91,7 @@ class ScalaProcessor(private val p : Actor) {
       
       private def handleError(res : String) {
         //TODO handle errors in a more uniform fashion
-        println("Error " + res)
+        println("Error: " + res)
       }
       
       def interpret(command : String) : InterpreterResults.Result = interp.interpret(command)
@@ -109,7 +109,7 @@ class ScalaProcessor(private val p : Actor) {
         reader.read match {
         case -1 =>
           //We are done with this actor, we can exit it
-          println("Pipe dead, exiting: 0")
+          println("Error: Pipe dead, exiting: 0")
           exit
         case x =>
           val sb = new StringBuilder
@@ -119,7 +119,7 @@ class ScalaProcessor(private val p : Actor) {
             if (reader.ready) {
               reader.read match {
               case -1 =>
-                println("Pipe dead, exiting: 1")
+                println("Error: Pipe dead, exiting: 1")
               case x =>
                 val c = x.asInstanceOf[Char]
                 sb.append(c)
