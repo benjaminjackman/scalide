@@ -20,3 +20,11 @@ Press shift+enter inside a cell to evaluate it.
 Press alt+up/down to move from cell to cell
 
 From the menubar select Interpreter > Restart to restart if anything goes wrong or the interpreter starts acting weird.
+
+= Known Issues =
+
+Standard out does not display in the result boxes for the interpreter, instead it is placed in the console where the interpreter was started from. In a future version I plan to add a console window if anyone wants it. _the primary problem with including the output of a print command there is that it is not routed directly through the interpreter and so it becomes pretty difficult to determine which command generated the std::out in most circumstances_
+
+There is no way to delete cells. This will be fixed in an upcoming release, probably with the keyboard shortcut ctrl+del.
+
+The interpreter hangs sometimes, please post issues when this happens and I will look into it. In the mean time i suggest that you restart with ctrl+r or Interpreter > Restart. and re-evaluate the cells you need to get back to the execution state that you previously were at.
