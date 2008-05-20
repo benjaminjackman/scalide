@@ -17,8 +17,8 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val version = 5
 
   //An editor group consists of an editor and the code for it
-  class EditorGroup(private val isOut : Boolean, val text : String) extends JPanel {
-    def this(isOut : Boolean) = this (isOut, "")
+  class EditorGroup(private val isOut : Boolean, val text : Option[String], val commandNum : Option[Int]) extends JPanel {
+    def this(isOut : Boolean) = this (isOut, None, None)
     val editor = new CodeCellEditor(OuterEditor.this, isOut)
     val label = new JLabel(if (editor.isOut) "out " else "in ")
     
@@ -30,7 +30,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
     }
     
     swingLater {
-      editor.setText(text)
+      editor.setText(text getOrElse "")
       label.setForeground(Color.BLUE)
       label.setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, 10))
       label.setOpaque(false)
@@ -148,7 +148,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
             (x,y) =>
             try {x.text.toBoolean} catch {case e=>false}
           }
-          val ed = new EditorGroup(isOut, cell.text)
+          val ed = new EditorGroup(isOut, Some(cell.text), None)
           if (isFocus) {
             focused = Some(ed)
             swingLater{ed.grabFocus}
@@ -191,11 +191,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
       case res : InterpResult =>
         var foundIt = false;
         var insertedIt = false;
-        def mkNew = {
-          val ed = new EditorGroup(true)
-          swingLater {ed.editor.setText(res.text)}
-          ed
-        }
+        def mkNew = new EditorGroup(true, Some(res.text), Some(res.cmd.requestId))
         editors = editors.flatMap { 
           ed =>
           if (insertedIt) {
