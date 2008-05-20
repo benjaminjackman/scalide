@@ -1,5 +1,5 @@
 #labels Featured
-=Scalide Google Code Wiki=
+=Scalide Wiki=
 The wiki page for Scalide
 
 == Introduction ==
