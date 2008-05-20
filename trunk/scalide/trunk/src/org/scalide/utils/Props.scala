@@ -24,7 +24,6 @@ object Props extends PropertiesParser {
       for (val line <- Source.fromFile(file).getLines) {
         parse(line) match {
         case Some(entry) =>
-          println("Added Prop " + entry)
           props = props + entry
         case None =>
         }
