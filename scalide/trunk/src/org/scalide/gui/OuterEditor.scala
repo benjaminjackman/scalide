@@ -20,7 +20,20 @@ class OuterEditor(listener : Actor) extends JTextPane {
   class EditorGroup(private val isOut : Boolean, val text : Option[String], val commandNum : Option[Int]) extends JPanel {
     def this(isOut : Boolean) = this (isOut, None, None)
     val editor = new CodeCellEditor(OuterEditor.this, isOut)
-    val label = new JLabel(if (editor.isOut) "out " else "in ")
+    val label = new JLabel{
+      val suffix = commandNum match {
+      case Some(n) => 
+        "[" + n + "]"
+      case None => 
+        ""
+      }
+      
+      if (editor.isOut) {
+        "out"
+      } else {
+        "in " 
+      } + suffix 
+    }
     
     def setAsIn(commandNum : Int) {
       editor.isOut = false
