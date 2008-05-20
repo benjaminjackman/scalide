@@ -86,6 +86,10 @@ class CodeCellEditor(private val outEd : OuterEditor,  var isOut : Boolean) exte
       bindAction(VK_ENTER, SHIFT_MASK) {
         outEd.interpret
       }
+      
+      bindAction(VK_ENTER, SHIFT_MASK | CTRL_MASK) {
+        outEd.interpretAll
+      }
       setKeymap(keymap)
       //Bind the other commands
     }
