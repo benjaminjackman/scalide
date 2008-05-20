@@ -79,6 +79,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   def help {listener ! ShowHelpDialog()}
   def restart {listener ! RestartInterpreter()}
   def mkCodeCell {proc ! MakeCodeCell()}
+  def delCodeCell {proc ! DeleteCodeCell()}
   def mvFocusUp {proc ! MoveFocusUp() }
   def mvFocusDown {proc ! MoveFocusDown() }
   def load(xml : scala.xml.Elem) {proc ! Load(xml)}
@@ -88,6 +89,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   case class InterpretCurrent
   case class InterpretAll
   case class MakeCodeCell
+  case class DeleteCodeCell
   case class Refresh
   case class Save(promptForFile : Boolean)
   case class Load(xml : scala.xml.Elem)
