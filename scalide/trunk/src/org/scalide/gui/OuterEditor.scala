@@ -17,39 +17,49 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val version = 5
 
   //An editor group consists of an editor and the code for it
-  class EditorGroup(private val isOut : Boolean, val text : Option[String], val commandNum : Option[Int]) extends JPanel {
+  class EditorGroup(private val out : Boolean, val text : Option[String], private var commandNum : Option[Int]) {
     def this(isOut : Boolean) = this (isOut, None, None)
-    val editor = new CodeCellEditor(OuterEditor.this, isOut)
-    val label = new JLabel{
-      val suffix = commandNum match {
-      case Some(n) => 
-        "[" + n + "]"
-      case None => 
-        ""
+    private val panel = new JPanel
+    private val editor = new CodeCellEditor(OuterEditor.this, out)
+    private val label = new JLabel()
+    
+    def isOut = editor.isOut
+    
+    def getText = editor.getText
+    
+    def getCell = editor.cell
+    
+    private def updateLabel() {
+      label.setText((if (editor.isOut) "out" else "in") + commandNum.foldRight("")("["+_+_+"]") + "=")
+    }
+    
+    def setText(text : String, commandNum : Option[Int]) {
+      swingLater{
+        this.commandNum = commandNum
+        editor.setText(text)
+        updateLabel()
       }
-      
-      if (editor.isOut) {
-        "out"
-      } else {
-        "in " 
-      } + suffix 
     }
     
     def setAsIn(commandNum : Int) {
+      this.commandNum = Some(commandNum)
       editor.isOut = false
-      swingLater {
-        label.setText("in["+commandNum+"]=")
-      }
+      updateLabel()
     }
+    
+    def grabFocus = this.editor.grabFocus
+    
+    def getPanel = this.panel
     
     swingLater {
       editor.setText(text getOrElse "")
+      updateLabel()
       label.setForeground(Color.BLUE)
       label.setFont(new Font(Props("InnerEditor.font.name", "Courier New"), 0, 10))
       label.setOpaque(false)
-      setLayout(new BorderLayout)
-      this.add(editor, BorderLayout.CENTER)
-      this.add(label, BorderLayout.WEST)
+      panel.setLayout(new BorderLayout)
+      panel.add(editor, BorderLayout.CENTER)
+      panel.add(label, BorderLayout.WEST)
       editor.addFocusListener { 
         new FocusListener {
           def focusLost(e : FocusEvent) {}
@@ -117,12 +127,12 @@ class OuterEditor(listener : Actor) extends JTextPane {
       def generateSaveXML = {
         (<Scalapad version={version.toString}>
          {for (ed <- editors) yield {
-          (<CodeCell isOut={ed.editor.isOut.toString} isFocus={
+          (<CodeCell isOut={ed.isOut.toString} isFocus={
             (focused match {
             case Some(x) => x==ed
             case None => false
             }).toString
-          }>{ed.editor.getText}</CodeCell>)
+          }>{ed.getText}</CodeCell>)
         }}
         </Scalapad>)
       }
@@ -131,8 +141,9 @@ class OuterEditor(listener : Actor) extends JTextPane {
         val commandNum = i
         swingLater { 
           import core.UserMessages._
-          val text = ed.editor.getText
-          val command = ProcessCell(ed.editor.cell,1,text)
+          val text = ed.getText
+          ed.setAsIn(commandNum)
+          val command = ProcessCell(ed.getCell,commandNum,text)
           process(command)
         } 
         i
@@ -143,7 +154,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
           edg.setAsIn(interpret(edg))
         }
       case InterpretAll() =>
-        editors filter (!_.editor.isOut) foreach {interpret _}
+        editors filter (!_.isOut) foreach {interpret _}
       case ChangeFocus(ed)=>
         focused = ed
       case Save(prompt) =>
@@ -190,7 +201,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
           justBefore(editors.elements, focused.get ==).foreach {
             ed =>
             focused = Some(ed)
-            swingLater{ed.editor.grabFocus}
+            swingLater{ed.grabFocus}
           }
         }
       case MoveFocusDown() =>
@@ -198,7 +209,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
           justAfter(editors.elements, focused.get ==).foreach {
             ed =>
             focused = Some(ed)
-            swingLater{ed.editor.grabFocus}
+            swingLater{ed.grabFocus}
           }
         }	   
       case res : InterpResult =>
@@ -214,14 +225,14 @@ class OuterEditor(listener : Actor) extends JTextPane {
             //Now we are going to insert the editor since 
             //we have just found the old one
             insertedIt = true
-            if (ed.editor.isOut) {
-              swingLater{ed.editor.setText(res.text)}
+            if (ed.isOut) {
+              swingLater{ed.setText(res.text, Some(res.cmd.requestId))}
               ed::Nil
             } else {
               mkNew::ed::Nil
             }
           } else {
-            if (ed.editor.cell == res.cmd.cell) {
+            if (ed.getCell == res.cmd.cell) {
               foundIt = true
               }
             ed::Nil
@@ -243,11 +254,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
           setCaretPosition(getDocument.getLength)
           eds.foreach { 
             ed =>
-            insertComponent(ed)
+            insertComponent(ed.getPanel)
             getEditorKit.read(new StringReader("\n"), getDocument(), getDocument().getLength())
           }
           //Focus on the active editor
-          focused.foreach(_.editor.grabFocus)
+          focused.foreach(_.grabFocus)
         }
       }
     }
