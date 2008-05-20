@@ -15,6 +15,7 @@ http://groups.google.com/group/scalide
 
 == Getting Started ==
 To run download the latest jar, Java 1.6 is required.
+
 run with java -jar <filename you saved the file as>
 
 Press shift+enter inside a cell to evaluate it.
