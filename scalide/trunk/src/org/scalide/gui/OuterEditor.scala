@@ -21,6 +21,14 @@ class OuterEditor(listener : Actor) extends JTextPane {
     def this(isOut : Boolean) = this (isOut, "")
     val editor = new CodeCellEditor(OuterEditor.this, isOut)
     val label = new JLabel(if (editor.isOut) "out " else "in ")
+    
+    def setAsIn(commandNum : Int) {
+      editor.isOut = false
+      swingLater {
+        label.setText("in["+commandNum+"]=")
+      }
+    }
+    
     swingLater {
       editor.setText(text)
       label.setForeground(Color.BLUE)
@@ -106,17 +114,20 @@ class OuterEditor(listener : Actor) extends JTextPane {
         </Scalapad>)
       }
       def interpret(ed : EditorGroup) = {
+        i += 1
+        val commandNum = i
         swingLater { 
           import core.UserMessages._
           val text = ed.editor.getText
           val command = ProcessCell(ed.editor.cell,1,text)
           process(command)
         } 
+        i
       }
       receive {
       case InterpretCurrent() =>
-        focused foreach {ed => 
-          interpret(ed)
+        focused foreach {edg =>
+          edg.setAsIn(interpret(edg))
         }
       case InterpretAll() =>
         editors filter (!_.editor.isOut) foreach {interpret _}
