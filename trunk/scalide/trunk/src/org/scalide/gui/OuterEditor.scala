@@ -213,9 +213,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
           //or we do not have a focus that matches
           editors
         case (Nil, y0::y1::ys) =>
+          //Erasing the first cell
           focused = Some(y1)
           y1::ys
         case (xs, y::ys) =>
+          //Erasing any cell after the first
           focused = Some(xs.last)
           xs:::ys
         }
