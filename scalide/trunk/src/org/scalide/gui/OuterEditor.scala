@@ -17,7 +17,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val version = 5
 
   //An editor group consists of an editor and the code for it
-  class EditorGroup(val isOut : Boolean, val text : String) extends JPanel {
+  class EditorGroup(private val isOut : Boolean, val text : String) extends JPanel {
     def this(isOut : Boolean) = this (isOut, "")
     val editor = new CodeCellEditor(OuterEditor.this, isOut)
     val label = new JLabel(if (editor.isOut) "out " else "in ")
@@ -115,9 +115,11 @@ class OuterEditor(listener : Actor) extends JTextPane {
       }
       receive {
       case InterpretCurrent() =>
-        focused foreach {interpret _}
+        focused foreach {ed => 
+          interpret(ed)
+        }
       case InterpretAll() =>
-        editors foreach {interpret _}
+        editors filter (!_.editor.isOut) foreach {interpret _}
       case ChangeFocus(ed)=>
         focused = ed
       case Save(prompt) =>
