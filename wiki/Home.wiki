@@ -12,6 +12,8 @@ http://scalide.blogspot.com
 Discuss in the Scalide google group at:
 http://groups.google.com/group/scalide
 
+== Screenshot ==
+
 [http://scalide.googlecode.com/files/Screenshot-Scalide.png]
 
 == Getting Started ==
