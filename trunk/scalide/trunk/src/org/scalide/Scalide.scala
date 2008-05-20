@@ -131,6 +131,4 @@ class Scalide(private val args : Array[String]) {
   val interp = new ScalaProcessor(p)
   val frame = new ScalideFrame(p)
   
-  
-  
 }
