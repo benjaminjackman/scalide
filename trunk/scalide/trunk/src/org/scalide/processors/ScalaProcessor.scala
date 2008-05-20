@@ -109,7 +109,7 @@ class ScalaProcessor(private val p : Actor) {
           case Incomplete =>
             //Do Nothing!
             //Just let the interpreter keep waiting
-            p ! InterpResult(command, "Incomplete Expression")
+            p ! InterpResult(command, "<Incomplete Expression>")
           }
         case Restart =>
           restart
