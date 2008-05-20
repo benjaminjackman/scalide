@@ -90,6 +90,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   val proc : Actor = actor {
     var editors = List[EditorGroup](new EditorGroup(false))
     var focused : Option[EditorGroup] = Some(editors.first)
+    //counter used to mark commands with a number
     var i = 0
     loop {
       def generateSaveXML = {
