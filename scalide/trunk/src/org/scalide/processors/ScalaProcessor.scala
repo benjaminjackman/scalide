@@ -99,6 +99,7 @@ class ScalaProcessor(private val p : Actor) {
           case Success | Error =>
             def getResult : String = {
               if (interp.hasResult) {
+                //Here return the result, less the line end
                 interp.getResult.stripLineEnd
               } else {
                 "<No Result>"

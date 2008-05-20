@@ -72,26 +72,6 @@ class OuterEditor(listener : Actor) extends JTextPane {
  }
 
   
-  swingLater {
-    setEditable(false)
-    setForeground(Color.BLUE)
-    setFont(new Font("Consolas", 0,12))
-    /*
-    addKeyListener(new KeyListener {
-      def keyTyped(e : KeyEvent) {
-        e.consume
-      }
-      def keyPressed(e : KeyEvent) {
-        e.consume
-      }
-      def keyReleased(e : KeyEvent) {
-        e.consume
-      }
-    })
-     */
-    proc ! Refresh()
-  }
-  
   def process(res : InterpResult) {proc ! res}
   def process(cmd : ProcessCell) {listener ! cmd}
   def start {proc ! Refresh()}
@@ -123,18 +103,19 @@ class OuterEditor(listener : Actor) extends JTextPane {
     var focused : Option[EditorGroup] = Some(editors.first)
     //counter used to mark commands with a number
     var i = 0
+    
     loop {
       def generateSaveXML = {
         (<Scalapad version={version.toString}>
-         {for (ed <- editors) yield {
-          (<CodeCell isOut={ed.isOut.toString} isFocus={
-            (focused match {
-            case Some(x) => x==ed
-            case None => false
-            }).toString
-          }>{ed.getText}</CodeCell>)
-        }}
-        </Scalapad>)
+           {for (ed <- editors) yield {
+             (<CodeCell isOut={ed.isOut.toString} isFocus={
+               (focused match {
+                case Some(x) => x==ed
+                case None => false
+               }).toString
+             }>{ed.getText}</CodeCell>)
+           }}
+         </Scalapad>)
       }
       def interpret(ed : EditorGroup) = {
         i += 1
@@ -188,8 +169,15 @@ class OuterEditor(listener : Actor) extends JTextPane {
       case MakeCodeCell() =>
         val newEd = new EditorGroup(false);
         editors = focused match {
-        case Some(ed) =>
-          editors:::newEd::Nil
+        case Some(fed) =>
+          editors flatMap {
+            _ match {
+            case `fed` => 
+              fed::newEd::Nil 
+            case ed => 
+              ed::Nil
+            }
+          }
         case None =>
           editors:::newEd::Nil
         }
@@ -249,7 +237,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
         val eds = editors
         swingLater {
           //Clear this window
-          this.setText("")
+          setText("")
           //Set the caret to the end of the document
           setCaretPosition(getDocument.getLength)
           eds.foreach { 
@@ -262,6 +250,26 @@ class OuterEditor(listener : Actor) extends JTextPane {
         }
       }
     }
+  }
+  
+  swingLater {
+    setEditable(false)
+    setForeground(Color.BLUE)
+    setFont(new Font("Consolas", 0,12))
+    /*
+    addKeyListener(new KeyListener {
+      def keyTyped(e : KeyEvent) {
+        e.consume
+      }
+      def keyPressed(e : KeyEvent) {
+        e.consume
+      }
+      def keyReleased(e : KeyEvent) {
+        e.consume
+      }
+    })
+     */
+    proc ! Refresh()
   }
 }
 
