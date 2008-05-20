@@ -62,6 +62,7 @@ class ScalideFrame(private val p : Actor) extends JFrame {
         }	
         new Menu("CodeCell") {
           "New                          Ctrl+N" does {editor.mkCodeCell}
+          "Delete                     Ctrl+Del" does {editor.delCodeCell}
         }	
         new Menu("Help") {
           "Contents                         F1" does {p ! ShowHelpDialog()}

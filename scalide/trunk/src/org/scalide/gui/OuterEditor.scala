@@ -190,6 +190,10 @@ class OuterEditor(listener : Actor) extends JTextPane {
         focused = Some(newEd)
         swingLater{newEd.grabFocus}
         proc ! Refresh()
+      case MoveCellUp() =>
+        //Not implemented
+      case MoveCellDown() =>
+        //Not implemented
       case MoveFocusUp() =>
         if (focused.isDefined) {
           justBefore(editors.elements, focused.get ==).foreach {
