@@ -210,7 +210,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
         editors = editors.span(ed=> !focused.exists(fed=>ed==fed)) match {
         case (Nil, _::Nil) | (_, Nil) =>
           //This would leave us with too few editors,
-          //or we do not have a focus
+          //or we do not have a focus that matches
           editors
         case (Nil, y0::y1::ys) =>
           focused = Some(y1)
