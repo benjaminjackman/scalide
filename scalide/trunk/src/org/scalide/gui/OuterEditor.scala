@@ -33,7 +33,6 @@ class OuterEditor(listener : Actor) extends JTextPane {
         new FocusListener {
           def focusLost(e : FocusEvent) {}
           def focusGained(e : FocusEvent) {
-            println("focus gained" + editor)
             proc ! ChangeFocus(Some(EditorGroup.this))
           }
         }
@@ -43,7 +42,6 @@ class OuterEditor(listener : Actor) extends JTextPane {
 
   
   swingLater {
-    println("Making Panel " + Thread.currentThread)
     setEditable(false)
     setForeground(Color.BLUE)
     setFont(new Font("Consolas", 0,12))
@@ -111,7 +109,6 @@ class OuterEditor(listener : Actor) extends JTextPane {
           import core.UserMessages._
           val text = ed.editor.getText
           val command = ProcessCell(ed.editor.cell,1,text)
-          println("Sending Command " + command)
           process(command)
         } 
       }
@@ -124,11 +121,8 @@ class OuterEditor(listener : Actor) extends JTextPane {
         focused = ed
       case Save(prompt) =>
         val s = generateSaveXML
-        println(s)
         listener ! SaveData(s, prompt)
       case Load(xml) =>
-        println("Loading:")
-        println(xml)
         val newEds = xml\"CodeCell" map {
           cell=>
           //determine if this is an out cell, default to false when we have no elements
@@ -140,7 +134,6 @@ class OuterEditor(listener : Actor) extends JTextPane {
             (x,y) =>
             try {x.text.toBoolean} catch {case e=>false}
           }
-          println("Cell:" + cell.text)
           val ed = new EditorGroup(isOut, cell.text)
           if (isFocus) {
             focused = Some(ed)
@@ -151,12 +144,10 @@ class OuterEditor(listener : Actor) extends JTextPane {
         case Nil =>
           //Do nothing when we parse an empty list
         case xs =>
-          println(xs)
           editors = xs
         }
         proc ! Refresh()
       case MakeCodeCell() =>
-        println("Making code cell")
         val newEd = new EditorGroup(false);
         editors = focused match {
         case Some(ed) =>
@@ -201,15 +192,12 @@ class OuterEditor(listener : Actor) extends JTextPane {
             //we have just found the old one
             insertedIt = true
             if (ed.editor.isOut) {
-              println("Inserting result to out editor")
               swingLater{ed.editor.setText(res.text)}
               ed::Nil
             } else {
-              println("Making new editor")
               mkNew::ed::Nil
             }
           } else {
-            println("Found Editor")
             if (ed.editor.cell == res.cmd.cell) {
               foundIt = true
               }
