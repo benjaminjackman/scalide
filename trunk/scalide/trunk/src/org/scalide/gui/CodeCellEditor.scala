@@ -58,7 +58,7 @@ class CodeCellEditor(private val outEd : OuterEditor,  var isOut : Boolean) exte
       }
       
       //Bind the execute command
-      bindAction(VK_N, CTRL_MASK) {
+      bindAction(VK_DELETE, CTRL_MASK) {
         //Jump up one cell
         outEd.delCodeCell
       }
@@ -71,6 +71,16 @@ class CodeCellEditor(private val outEd : OuterEditor,  var isOut : Boolean) exte
       bindAction(VK_DOWN, CTRL_MASK) {
         //Jump down one cell
         outEd.mvFocusDown
+      }
+      
+      bindAction(VK_UP, ALT_MASK) {
+        //Jump up one cell
+        outEd.mvCellUp
+      }
+      
+      bindAction(VK_DOWN, ALT_MASK) {
+        //Jump down one cell
+        outEd.mvCellDown
       }
       
       bindAction(VK_ENTER, SHIFT_MASK) {
