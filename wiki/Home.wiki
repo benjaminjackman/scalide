@@ -22,7 +22,7 @@ Press shift+enter inside a cell to evaluate it.
 
 Press ctrl+up/down to move from cell to cell
 
-From the menubar select Interpreter > Restart or press ctrl+R to restart if anything goes wrong or the interpreter starts acting weird.
+From the menubar select Interpreter > Restart or press Ctrl+R to restart if anything goes wrong or the interpreter starts acting weird.
 
 == Known Issues ==
 
