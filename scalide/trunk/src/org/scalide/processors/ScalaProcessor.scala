@@ -94,18 +94,18 @@ class ScalaProcessor(private val p : Actor) {
         println("Error " + res)
       }
       
-      def interpret(command : String) = interp.interpret(command)
+      def interpret(command : String) : InterpreterResults.Result = interp.interpret(command)
       
-      def close = {
+      def close {
         interp.close
         reader.close
       }
       
-      def hasResult = {
+      def hasResult : Boolean = {
         reader.ready
       }
       
-      def getResult = { 
+      def getResult : String = { 
         reader.read match {
         case -1 =>
           //We are done with this actor, we can exit it
