@@ -82,6 +82,8 @@ class OuterEditor(listener : Actor) extends JTextPane {
   def delCodeCell {proc ! DeleteCodeCell()}
   def mvFocusUp {proc ! MoveFocusUp() }
   def mvFocusDown {proc ! MoveFocusDown() }
+  def mvCellUp {proc ! MoveCellUp() }
+  def mvCellDown {proc ! MoveCellDown() }
   def load(xml : scala.xml.Elem) {proc ! Load(xml)}
   def interpret {proc ! InterpretCurrent()}
   def interpretAll {proc ! InterpretAll()}
@@ -97,6 +99,8 @@ class OuterEditor(listener : Actor) extends JTextPane {
   class CodeCellAction
   case class MoveFocusUp extends CodeCellAction
   case class MoveFocusDown extends CodeCellAction
+  case class MoveCellUp extends CodeCellAction
+  case class MoveCellDown extends CodeCellAction
   case class ChangeFocus(ed : Option[EditorGroup])
 
   
@@ -201,7 +205,21 @@ class OuterEditor(listener : Actor) extends JTextPane {
             focused = Some(ed)
             swingLater{ed.grabFocus}
           }
-        }	   
+        }
+      case DeleteCodeCell() =>
+        editors = editors.span(ed=> !focused.exists(fed=>ed==fed)) match {
+        case (Nil, _::Nil) | (_, Nil) =>
+          //This would leave us with too few editors,
+          //or we do not have a focus
+          editors
+        case (Nil, y0::y1::ys) =>
+          focused = Some(y1)
+          y1::ys
+        case (xs, y::ys) =>
+          focused = Some(xs.last)
+          xs:::ys
+        }
+        proc ! Refresh()
       case res : InterpResult =>
         var foundIt = false;
         var insertedIt = false;
