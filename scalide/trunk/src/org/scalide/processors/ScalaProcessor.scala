@@ -95,21 +95,57 @@ class ScalaProcessor(private val p : Actor) {
       receive {
         case command : ProcessCell =>
           import InterpreterResults._
-          interp.interpret(command.text) match {
-          case Success | Error =>
-            def getResult : String = {
-              if (interp.hasResult) {
-                //Here return the result, less the line end
-                interp.getResult.stripLineEnd
-              } else {
-                "<No Result>"
+          import scala.util.matching.Regex
+          val loadRegex = new Regex("""\s*:load\s+(.*)\s*""", "filename")
+          def interpret(x: String) = {
+            interp.interpret(x) match {
+            case Success | Error =>
+              def getResult : String = {
+                if (interp.hasResult) {
+                  //Here return the result, less the line end
+                  interp.getResult.stripLineEnd
+                } else {
+                  "<No Result>"
+                }
+              }
+              InterpResult(command, getResult)
+            case Incomplete =>
+              //Do Nothing!
+              //Just let the interpreter keep waiting
+              InterpResult(command, "<Incomplete Expression>")
+            }
+          }
+          
+          command.text match {
+          case `loadRegex`(filename) =>
+            import io.Source
+            import java.io.{FileNotFoundException, IOException}
+            def load(filename : String) : InterpResult = {
+              try {
+                val results = for (val line <- Source.fromFile(filename).getLines) yield {
+                  interpret(line)
+                };
+                results.foldLeft(None.asInstanceOf[Option[InterpResult]]){
+                  (bigRes: Option[InterpResult], curRes: InterpResult) =>
+                  bigRes match {
+                  case None =>
+                    Some(curRes)
+                  case Some(bigRes) =>
+                    Some(InterpResult(command, bigRes.text + "\n" + curRes.text))
+                  }
+                }.getOrElse(InterpResult(command, "<Empty File>"))
+              } catch {
+              case e : FileNotFoundException => 
+                InterpResult(command, "<Unable to load file, Not Found:[" + filename + "]>")
+              case e : IOException => 
+                InterpResult(command, "<Unable to load file, IOException: " + e + ">")
+              case e : Throwable => 
+                InterpResult(command, "<Unable to load file: " + e + ">")
               }
             }
-            p ! InterpResult(command, getResult)
-          case Incomplete =>
-            //Do Nothing!
-            //Just let the interpreter keep waiting
-            p ! InterpResult(command, "<Incomplete Expression>")
+            p ! load(filename)
+          case x =>
+            p ! interpret(x)
           }
         case Restart =>
           restart
