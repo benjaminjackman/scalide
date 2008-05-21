@@ -116,35 +116,31 @@ class ScalaProcessor(private val p : Actor) {
           
           import scala.util.matching.Regex
           val loadRegex = new Regex("""\s*:load\s+(.*)\s*""", "filename")
+          val readRegex = new Regex("""\s*:read\s+(.*)\s*""", "filename")
 
-          command.text match {
-          case `loadRegex`(filename) =>
+          def read(filename : String) (fn : (String) => InterpResult) : InterpResult = {
             import io.Source
             import java.io.{FileNotFoundException, IOException}
-            def load(filename : String) : InterpResult = {
-              try {
-                val results = for (val line <- Source.fromFile(filename).getLines) yield {
-                  interpret(line)
-                };
-                results.foldLeft(None.asInstanceOf[Option[InterpResult]]){
-                  (bigRes: Option[InterpResult], curRes: InterpResult) =>
-                  bigRes match {
-                  case None =>
-                    Some(curRes)
-                  case Some(bigRes) =>
-                    Some(InterpResult(command, bigRes.text + "\n" + curRes.text))
-                  }
-                }.getOrElse(InterpResult(command, "<Empty File>"))
-              } catch {
-              case e : FileNotFoundException => 
-                InterpResult(command, "<Unable to load file, Not Found:[" + filename + "]>")
-              case e : IOException => 
-                InterpResult(command, "<Unable to load file, IOException: " + e + ">")
-              case e : Throwable => 
-                InterpResult(command, "<Unable to load file: " + e + ">")
-              }
+
+            try {
+              val sb = new StringBuilder;
+              Source.fromFile(filename).getLines.foreach(sb.append(_))
+              fn(sb.toString)
+            } catch {
+            case e : FileNotFoundException => 
+              InterpResult(command, "<Unable to load file, Not Found:[" + filename + "]>")
+            case e : IOException => 
+              InterpResult(command, "<Unable to load file, IOException: " + e + ">")
+            case e : Throwable => 
+              InterpResult(command, "<Unable to load file: " + e + ">")
             }
-            p ! load(filename)
+          }
+          
+          command.text match {
+          case `loadRegex`(filename) =>
+            p ! read(filename) {interpret(_)}
+          case `readRegex`(filename) =>
+            p ! read(filename) {InterpResult(command, _)}
           case x =>
             p ! interpret(x)
           }
