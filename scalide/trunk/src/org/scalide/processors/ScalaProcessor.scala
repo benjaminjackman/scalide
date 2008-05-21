@@ -95,8 +95,6 @@ class ScalaProcessor(private val p : Actor) {
       receive {
         case command : ProcessCell =>
           import InterpreterResults._
-          import scala.util.matching.Regex
-          val loadRegex = new Regex("""\s*:load\s+(.*)\s*""", "filename")
           def interpret(x: String) = {
             interp.interpret(x) match {
             case Success | Error =>
@@ -116,6 +114,9 @@ class ScalaProcessor(private val p : Actor) {
             }
           }
           
+          import scala.util.matching.Regex
+          val loadRegex = new Regex("""\s*:load\s+(.*)\s*""", "filename")
+
           command.text match {
           case `loadRegex`(filename) =>
             import io.Source
