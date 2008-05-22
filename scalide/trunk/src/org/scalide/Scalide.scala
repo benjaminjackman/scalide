@@ -12,18 +12,23 @@ class Scalide(private val args : Array[String]) {
   import org.scalide.utils.Props
   
   //Load the properties
-  try {
-    Props.loadProps("scalide.properties")
-  } catch {
-  case e : java.io.IOException =>
-    System.err.println(e.toString)
-  }
   
   case class SetCurrentSaveName(filename : Option[String])
-  
   //Set up the actor for relaying messages back and forth
   lazy val p : Actor = actor {
-    //Redirect the streams
+    try {
+      Props.loadProps("scalide.properties")
+    } catch {
+    case e : java.io.IOException =>
+      System.err.println(e.toString)
+    }
+
+    val interp = new ScalaProcessor(p)
+    val frame = new ScalideFrame(p)
+  
+    if (args.size > 0) {
+      p ! LoadFileByName(args(0))
+    }
 
     var currentSaveName : Option[String] = None
     
@@ -144,12 +149,7 @@ class Scalide(private val args : Array[String]) {
       }
       
     }
-  }	
-  
-  val interp = new ScalaProcessor(p)
-  val frame = new ScalideFrame(p)
-  
-  if (args.size > 0) {
-    p ! LoadFileByName(args(0))
   }
+  //Init the lazy val
+  p
 }
