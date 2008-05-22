@@ -4,6 +4,7 @@ object UserMessages {
   sealed abstract class UserMessage
   case class NewFile extends UserMessage
   case class OpenFile extends UserMessage
+  case class LoadFileByName(filename : String) extends UserMessage
   case class SaveFile extends UserMessage
   case class RestartInterpreter extends UserMessage
   case class ShowHelpDialog extends UserMessage
