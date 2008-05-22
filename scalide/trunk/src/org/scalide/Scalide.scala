@@ -1,12 +1,15 @@
 package org.scalide
 
 class Scalide(private val args : Array[String]) {
+  import core.UserMessages._
+  utils.ForkStream(System.out, System.setOut, {x => p ! SysoutMessage(x)})
+  utils.ForkStream(System.err, System.setErr, {x => p ! SyserrMessage(x)})
+  
   import scala.actors.Actor
   import Actor._
   import processors.ScalaProcessor
   import org.scalide.gui.ScalideFrame
   import org.scalide.utils.Props
-  import core.UserMessages._
   
   //Load the properties
   try {
@@ -16,13 +19,12 @@ class Scalide(private val args : Array[String]) {
     System.err.println(e.toString)
   }
   
-  //Load the scalabook file
-
-  
   case class SetCurrentSaveName(filename : Option[String])
   
   //Set up the actor for relaying messages back and forth
-  val p : Actor = actor {
+  lazy val p : Actor = actor {
+    //Redirect the streams
+
     var currentSaveName : Option[String] = None
     
     import core.InterpreterMessages._
@@ -58,7 +60,7 @@ class Scalide(private val args : Array[String]) {
           data
         } catch {
         case e =>
-          println("Unable to read scalabook file" + e.toString)
+          println("Unable to read scalabook file [" + filename + "] " + e.toString)
           None
         }
       }.foreach { frame load _}
@@ -97,6 +99,10 @@ class Scalide(private val args : Array[String]) {
           actor {
             new gui.HelpDialog
           }
+        case x: SysoutMessage =>
+          frame.process(x)
+        case x : SyserrMessage =>
+          frame.process(x)
         case cmd : ProcessCell => 
           interp.process(cmd)
         case SaveData(data, prompt) =>
@@ -136,6 +142,7 @@ class Scalide(private val args : Array[String]) {
       case 
         msg => println("Unhandled Message " + msg)
       }
+      
     }
   }	
   
