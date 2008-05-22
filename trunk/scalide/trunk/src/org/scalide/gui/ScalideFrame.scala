@@ -7,11 +7,13 @@ import scala.actors._
 import Actor._
 import org.scalide.utils._
 import core.InterpreterMessages._
+import core.UserMessages._
 
 class ScalideFrame(private val p : Actor) extends JFrame {
   import BetterSwing._
   
   val editor = new OuterEditor(p)
+  val printer = new PrinterEditor() 
   
   private[scalide] val proc = actor {
     
@@ -27,11 +29,17 @@ class ScalideFrame(private val p : Actor) extends JFrame {
         )
       case res : InterpResult =>
         editor process res
+      case msg : SysoutMessage =>
+        printer.process(msg)
+      case msg : SyserrMessage =>
+        printer.process(msg)
       }
     }
   }
   
   def process(res : InterpResult) {proc ! res}
+  def process(msg : SysoutMessage) {proc ! msg}
+  def process(msg : SyserrMessage) {proc ! msg}
   def load(data : scala.xml.Elem) {editor.load(data)}
   
   private def guiTask(task : => Unit ) {
@@ -78,11 +86,15 @@ class ScalideFrame(private val p : Actor) extends JFrame {
     setJMenuBar(mkMenuBar)
     setTitle("Scalide")
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    setContentPane(new JScrollPane(editor))
+    val splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT)
+    splitPane.setTopComponent(new JScrollPane(editor))
+    splitPane.setBottomComponent(new JScrollPane(printer))
+    setContentPane(splitPane)
     pack
     setVisible(true)
     //Have to set size after making the frame visible
     setSize(new Dimension(500, 700))
+    splitPane.setDividerLocation(500)
     editor.start
   }
   
