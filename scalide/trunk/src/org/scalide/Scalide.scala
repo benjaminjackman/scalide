@@ -6,6 +6,7 @@ class Scalide(private val args : Array[String]) {
   import processors.ScalaProcessor
   import org.scalide.gui.ScalideFrame
   import org.scalide.utils.Props
+  import core.UserMessages._
   
   //Load the properties
   try {
@@ -15,12 +16,15 @@ class Scalide(private val args : Array[String]) {
     System.err.println(e.toString)
   }
   
+  //Load the scalabook file
+
+  
   case class SetCurrentSaveName(filename : Option[String])
   
   //Set up the actor for relaying messages back and forth
   val p : Actor = actor {
     var currentSaveName : Option[String] = None
-    import core.UserMessages._
+    
     import core.InterpreterMessages._
       
     import javax.swing._
@@ -45,6 +49,20 @@ class Scalide(private val args : Array[String]) {
       }
       fc
     }
+    def loadFile(filename : String) {
+      {
+        println("Loading [" + filename +"]");
+        try {
+          val data = Some(scala.xml.XML.load(filename))
+          p ! SetCurrentSaveName(Some(filename))
+          data
+        } catch {
+        case e =>
+          println("Unable to read scalabook file" + e.toString)
+          None
+        }
+      }.foreach { frame load _}
+    }
     loop {
       receive {
       case SetCurrentSaveName(filename) =>
@@ -59,21 +77,14 @@ class Scalide(private val args : Array[String]) {
             mkFileChooser(_.showOpenDialog(frame)) {
               f =>
               actor {
-                println("Loading " + f.getAbsolutePath);
-                
-                {try {
-                  val filename = f.getAbsolutePath;
-                  val data = Some(scala.xml.XML.load(filename))
-                  p ! SetCurrentSaveName(Some(filename))
-                  data
-                } catch {
-                 case e=>
-                   println("Poorly Formatted XML File" + e.toString)
-                   None
-                }}.foreach {frame load _ }
+                loadFile(f.getAbsolutePath)
               }
             }
-          }	
+          }
+        case LoadFileByName(filename) =>
+          actor {
+            loadFile(filename)
+          }
         case SaveFile() => 
           println(msg)
         case RestartInterpreter() => 
@@ -131,4 +142,7 @@ class Scalide(private val args : Array[String]) {
   val interp = new ScalaProcessor(p)
   val frame = new ScalideFrame(p)
   
+  if (args.size > 0) {
+    p ! LoadFileByName(args(0))
+  }
 }
