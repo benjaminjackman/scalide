@@ -67,6 +67,7 @@ class ScalideFrame(private val p : Actor) extends JFrame {
           "Interpret               Shift+Enter" does {editor.interpret}
           "Interpret All      Ctrl+Shift+Enter" does {editor.interpretAll}
           "Restart                      Ctrl+R" does {p ! RestartInterpreter()}
+          "Clear Console				:clear" does {printer.clear}
         }	
         new Menu("CodeCell") {
           "New                          Ctrl+N" does {editor.mkCodeCell}
@@ -87,6 +88,7 @@ class ScalideFrame(private val p : Actor) extends JFrame {
     setTitle("Scalide")
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     val splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT)
+    
     splitPane.setTopComponent(new JScrollPane(editor))
     splitPane.setBottomComponent(new JScrollPane(printer))
     setContentPane(splitPane)

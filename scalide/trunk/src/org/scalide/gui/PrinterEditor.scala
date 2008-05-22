@@ -17,4 +17,10 @@ class PrinterEditor extends JTextPane {
   def process(msg : SyserrMessage) {
     display(msg.msg)
   }
+  
+  def clear {
+    swingLater {
+      setText("")
+    }
+  }
 }
