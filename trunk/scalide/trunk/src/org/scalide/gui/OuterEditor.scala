@@ -75,7 +75,7 @@ class OuterEditor(listener : Actor) extends JTextPane {
   def process(res : InterpResult) {proc ! res}
   def process(cmd : ProcessCell) {listener ! cmd}
   def start {proc ! Refresh()}
-  def save (promptForFile : boolean ){proc ! Save(promptForFile)}
+  def save (promptForFile : Boolean ){proc ! Save(promptForFile)}
   def help {listener ! ShowHelpDialog()}
   def restart {listener ! RestartInterpreter()}
   def mkCodeCell {proc ! MakeCodeCell()}
