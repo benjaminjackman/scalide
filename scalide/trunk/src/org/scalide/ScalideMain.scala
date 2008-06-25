@@ -6,6 +6,3 @@ object ScalideMain  {
   }
 }
 
-class FooBar {
-
-}
