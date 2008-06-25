@@ -1,0 +1,5 @@
+This page is designed to be an introduction to using Scalide.
+
+= What is Scalide =
+
+Currently it is simply an interpreter that seperates user input into a series of cells the user specifies. This allows the user to manage code as separate groups that can be evaluated and re-evaluated individually allowing for an interactive and iterative development process.
