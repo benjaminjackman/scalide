@@ -44,7 +44,7 @@ class Scalide(private val args : Array[String]) {
       swingLater {
         fc.addChoosableFileFilter(new FileFilter {
           override def accept(f : File) = {
-            f.getName.endsWith(".scalapad")
+            f.isDirectory || f.getName.endsWith(".scalapad")
           }
           override def getDescription = {
             "Scalapad files"
