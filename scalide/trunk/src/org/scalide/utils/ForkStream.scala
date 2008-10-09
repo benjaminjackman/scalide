@@ -5,7 +5,13 @@ package org.scalide.utils
 //back to the original
 import java.io._
 object ForkStream {
-  def apply(outStream : PrintStream, redirFn : (PrintStream) => Unit,  listener : (String) => Unit) {
+  
+  /** Redirects the standard output/error.
+   * outStream: the stream that is going to be redirected.
+   * setFn: the function that replaces the old outStream with the new forked one
+   * listener: a listener who will be called when output is sent to outStream
+   */
+  def fork(outStream : PrintStream, setFn : (PrintStream) => Unit,  listener : (String) => Unit) {
     import actors._
     import Actor._
 
@@ -14,7 +20,7 @@ object ForkStream {
     val pOut = new PipedOutputStream(iOut)
   
     //Redirect to the new standard out
-    redirFn(new PrintStream(pOut, true))
+    setFn(new PrintStream(pOut, true))
   
     //Now use and actor loop to read the data
     actor {

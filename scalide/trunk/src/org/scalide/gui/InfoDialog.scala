@@ -2,7 +2,7 @@ package org.scalide.gui
 
 import javax.swing._
 import utils.BetterSwing._
-class InfoDialog(title : String, text : String ) extends JDialog{
+class InfoDialog(val title2 : String, val text : String ) extends JDialog{
   val body = new JTextPane()
   swingLater {
     setSize(400,400)
@@ -10,6 +10,7 @@ class InfoDialog(title : String, text : String ) extends JDialog{
     body.setEditable(false)
     body.setText(text)
     add(body)
+    setTitle(title2)
     setModal(true)
     pack
     setVisible(true)
