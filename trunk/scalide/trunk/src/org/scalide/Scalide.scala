@@ -2,8 +2,8 @@ package org.scalide
 
 class Scalide(private val args : Array[String]) {
   import core.UserMessages._
-  utils.ForkStream(System.out, System.setOut, {x => p ! SysoutMessage(x)})
-  utils.ForkStream(System.err, System.setErr, {x => p ! SyserrMessage(x)})
+  utils.ForkStream.fork(System.out, System.setOut, {x => p ! SysoutMessage(x)})
+  utils.ForkStream.fork(System.err, System.setErr, {x => p ! SyserrMessage(x)})
   
   import scala.actors.Actor
   import Actor._
@@ -33,9 +33,10 @@ class Scalide(private val args : Array[String]) {
     var currentSaveName : Option[String] = None
     
     import core.InterpreterMessages._
-      
     import javax.swing._
     import java.io.File
+    
+    
     def mkFileChooser(action : (JFileChooser) => Int)(fileHandler : File => Unit) = {
       import javax.swing.filechooser._
       import utils.BetterSwing._
@@ -56,6 +57,7 @@ class Scalide(private val args : Array[String]) {
       }
       fc
     }
+    
     def loadFile(filename : String) {
       {
         println("Loading [" + filename +"]");
@@ -70,6 +72,7 @@ class Scalide(private val args : Array[String]) {
         }
       }.foreach { frame load _}
     }
+    
     loop {
       receive {
       case SetCurrentSaveName(filename) =>
