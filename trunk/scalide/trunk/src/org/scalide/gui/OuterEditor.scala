@@ -88,19 +88,19 @@ class OuterEditor(listener : Actor) extends JTextPane {
   def interpret {proc ! InterpretCurrent()}
   def interpretAll {proc ! InterpretAll()}
   
-  case class InterpretCurrent
-  case class InterpretAll
-  case class MakeCodeCell
-  case class DeleteCodeCell
-  case class Refresh
+  case class InterpretCurrent()
+  case class InterpretAll()
+  case class MakeCodeCell()
+  case class DeleteCodeCell()
+  case class Refresh()
   case class Save(promptForFile : Boolean)
   case class Load(xml : scala.xml.Elem)
   
-  class CodeCellAction
-  case class MoveFocusUp extends CodeCellAction
-  case class MoveFocusDown extends CodeCellAction
-  case class MoveCellUp extends CodeCellAction
-  case class MoveCellDown extends CodeCellAction
+  case class CodeCellAction()
+  case class MoveFocusUp() extends CodeCellAction
+  case class MoveFocusDown() extends CodeCellAction
+  case class MoveCellUp() extends CodeCellAction
+  case class MoveCellDown() extends CodeCellAction
   case class ChangeFocus(ed : Option[EditorGroup])
 
   

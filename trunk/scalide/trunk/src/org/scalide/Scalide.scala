@@ -25,7 +25,8 @@ class Scalide(private val args : Array[String]) {
 
     val interp = new ScalaProcessor(p)
     val frame = new ScalideFrame(p)
-  
+
+    
     if (args.size > 0) {
       p ! LoadFileByName(args(0))
     }
