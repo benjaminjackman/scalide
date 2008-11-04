@@ -1,5 +1,12 @@
 package org.scalide
 
+
+object Main {
+  def main(args : Array[String]) {
+    new Scalide(args)
+  }
+}
+
 class Scalide(private val args : Array[String]) {
   import core.UserMessages._
   utils.ForkStream.fork(System.out, System.setOut, {x => p ! SysoutMessage(x)})
