@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="build" name="Create Runnable Jar for Scalide">
+<project default="run" name="Scalide">
 	<property environment="env" />
 	<property name="base.dir" value="${basedir}" />
 	<property name="src.dir" value="${base.dir}/src" />
@@ -16,7 +16,7 @@
 
 	<target name="init">
 		<tstamp>
-			<format property="STANDARD" pattern="yyyy-MM-dd_HH-mm-ss"/>
+			<format property="STANDARD" pattern="yyyy-MM-dd_HH-mm-ss" />
 		</tstamp>
 		<path id="build.classpath">
 			<pathelement location="${scala-library.jar}" />
@@ -37,7 +37,13 @@
 
 	<target name="build" depends="init">
 		<mkdir dir="${build.dir}" />
-		<scalac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" force="changed"></scalac>
+		<scalac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" force="changed" addparams="-g" deprecation="on" encoding="us-ascii" target="jvm-1.5">
+			<include name="**/*.scala" />
+			<include name="**/*.java" />
+		</scalac>
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath">
+			<include name="**/*.java" />
+		</javac>
 	</target>
 
 	<macrodef name="mkJar">
@@ -48,7 +54,7 @@
 			<jar destfile="${jar.dir}/@{jarname}" filesetmanifest="mergewithoutmain">
 				<manifest>
 					<attribute name="Built-By" value="${user.name}" />
-					<attribute name="Main-Class" value="org.scalide.ScalideMain" />
+					<attribute name="Main-Class" value="org.scalide.Main" />
 					<attribute name="Class-Path" value="." />
 				</manifest>
 				<fileset dir="${build.dir}/" />
@@ -60,6 +66,17 @@
 
 	<target name="jar" depends="build">
 		<mkJar jarname="scalide.jar" />
+	</target>
+
+	<target name="run" depends="build">
+		<java dir="." classname="org.scalide.Main" fork="true" maxmemory="1024m" failonerror="true">
+	        <!-- <arg value="-h"/> -->
+	         <classpath>
+	           <pathelement location="${scala-library.jar}"/>
+	           <pathelement location="${scala-compiler.jar}"/>
+	           <pathelement path="${build.dir}"/>
+	         </classpath>
+		</java>
 	</target>
 
 	<target name="nightly" depends="clean, build">
