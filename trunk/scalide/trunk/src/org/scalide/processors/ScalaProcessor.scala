@@ -11,7 +11,7 @@ class ScalaProcessor(private val p : Actor) {
   import scala.tools.nsc.{Interpreter, Settings, InterpreterResults}
   
   case class ResultText(res : String)
-  case class Restart
+  case class Restart()
   
   private[scalide] def restart() {
      commandProc ! Restart
