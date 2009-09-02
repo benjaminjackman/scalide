@@ -1,4 +1,4 @@
-package org.scalide.utils
+package scalide.utils
 
 object Runner {
   /* Converts any methods to be a runnable

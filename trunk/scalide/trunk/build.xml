@@ -54,7 +54,7 @@
 			<jar destfile="${jar.dir}/@{jarname}" filesetmanifest="mergewithoutmain">
 				<manifest>
 					<attribute name="Built-By" value="${user.name}" />
-					<attribute name="Main-Class" value="org.scalide.Main" />
+					<attribute name="Main-Class" value="scalide.Main" />
 					<attribute name="Class-Path" value="." />
 				</manifest>
 				<fileset dir="${build.dir}/" />
@@ -69,7 +69,7 @@
 	</target>
 
 	<target name="run" depends="build">
-		<java dir="." classname="org.scalide.Main" fork="true" maxmemory="1024m" failonerror="true">
+		<java dir="." classname="scalide.Main" fork="true" maxmemory="1024m" failonerror="true">
 	        <!-- <arg value="-h"/> -->
 	         <classpath>
 	           <pathelement location="${scala-library.jar}"/>

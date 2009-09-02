@@ -1,4 +1,4 @@
-package org.scalide.processors
+package scalide.processors
 
 import scala.actors.{InputChannel, OutputChannel}
 import core.UserMessages._

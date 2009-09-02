@@ -1,4 +1,4 @@
-package org.scalide.utils
+package scalide.utils
 
 //This class helps fork sysout and
 //syserr onto a listener as well as 

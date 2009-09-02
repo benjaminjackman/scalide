@@ -1,4 +1,4 @@
-package org.scalide.core
+package scalide.core
 
 
 object InterpreterMessages {
