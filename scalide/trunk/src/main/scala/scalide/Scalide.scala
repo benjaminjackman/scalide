@@ -1,4 +1,4 @@
-package org.scalide
+package scalide
 
 
 object Main {
@@ -15,8 +15,8 @@ class Scalide(private val args : Array[String]) {
   import scala.actors.Actor
   import Actor._
   import processors.ScalaProcessor
-  import org.scalide.gui.ScalideFrame
-  import org.scalide.utils.Props
+  import scalide.gui.ScalideFrame
+  import scalide.utils.Props
   
   //Load the properties
   

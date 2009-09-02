@@ -1,4 +1,4 @@
-package org.scalide.res
+package scalide.res
 
 object Messages {
   val help = """<h1>Scalide Help</h1><br>

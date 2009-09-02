@@ -1,7 +1,7 @@
-package org.scalide.gui
+package scalide.gui
 
 import javax.swing._
-import org.scalide.utils.BetterSwing._
+import scalide.utils.BetterSwing._
 import java.awt.{Color, Dimension, Font, BorderLayout}
 import java.awt.event.{KeyListener, KeyEvent, FocusListener, FocusEvent}
 import scala.actors._

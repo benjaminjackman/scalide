@@ -1,4 +1,4 @@
-package org.scalide.utils
+package scalide.utils
 
 import javax.swing._;
 import text._;

@@ -1,4 +1,4 @@
-package org.scalide.utils
+package scalide.utils
 
 
 object ScalideCollections {

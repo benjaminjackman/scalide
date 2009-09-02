@@ -1,4 +1,4 @@
-package org.scalide.utils
+package scalide.utils
 
 	  /** A Domain specific language for making JMenus
     * @author  	david@mel David R. MacIver 

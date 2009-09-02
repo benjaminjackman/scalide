@@ -1,4 +1,4 @@
-package org.scalide.gui
+package scalide.gui
 
 import javax.swing._
 import utils.BetterSwing._

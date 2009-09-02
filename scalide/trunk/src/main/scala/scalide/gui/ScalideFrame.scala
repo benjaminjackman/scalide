@@ -1,11 +1,11 @@
-package org.scalide.gui
+package scalide.gui
 
 
 import javax.swing._
 import java.awt.{Color, Font, Dimension, BorderLayout}
 import scala.actors._
 import Actor._
-import org.scalide.utils._
+import scalide.utils._
 import core.InterpreterMessages._
 import core.UserMessages._
 

@@ -1,4 +1,4 @@
-package org.scalide.utils
+package scalide.utils
 
 object Props extends PropertiesParser {
   var props : Map[String, String] = Map()
